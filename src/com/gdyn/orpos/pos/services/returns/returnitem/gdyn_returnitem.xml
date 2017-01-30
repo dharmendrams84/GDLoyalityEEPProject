@@ -1,0 +1,952 @@
+<?xml version='1.0' ?>
+<!--
+//
+// Copyright (c) 2012-2013, Starmount and Groupe Dynamite.
+// All rights reserved.
+//
+-->
+
+<!DOCTYPE SERVICE SYSTEM "classpath://oracle/retail/stores/foundation/tour/dtd/tourguide.dtd">
+
+<SERVICE
+    name="ItemReturn"
+    package="oracle.retail.stores.pos.services.returns.returnitem"
+    tourcam="OFF">
+    <!-- modified by Vivek Created a new cargo to get the loyalty ID. -->
+    <CARGO  class="GDYNReturnItemCargo" package="com.gdyn.orpos.pos.services.returns.returnitem" />
+    <SERVICECODE>
+        <LANEACTION class="ContinueConversionAisle" package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="FailureConversionAisle" package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="GetReturnItemEnteredAisle"/>
+        <LANEACTION class="GetReturnItemInformationAisle" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+        <LANEACTION class="ItemInfoEnteredAisle"/>
+        <LANEACTION class="ItemPriceCodeInfoEnteredAisle" package="oracle.retail.stores.pos.services.returns.returnitem"/>
+        <LANEACTION class="LookupPriceCodeAisle"/>
+        <LANEACTION class="ResetRestockingFeeRoad" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+        <LANEACTION class="ResetRestockingFeeAndSetNextItemRoad" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+        <LANEACTION class="ReturnSuccessProcessingRoad"/>
+        <LANEACTION class="SetNextReturnItemRoad"/>
+        <LANEACTION class="SuccessConversionAisle" package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="SuccessLookupPriceCodeRoad"/>
+        <LANEACTION class="UndoEnterReturnItemRoad"/>
+        <LANEACTION class="UpdateReturnItemListRoad"/>
+        <LANEACTION class="ValidateReturnSerialQuantityAisle"/>
+        <LANEACTION class="CheckIfSizeRequiredAisle"/>
+        <LANEACTION class="CheckItemReturnableAisle"/>
+        <LANEACTION class="ValidateItemSizeAisle" package="oracle.retail.stores.pos.services.returns.returnoptions"/>
+        <LANEACTION class="DeleteItemRoad"/>
+        <LANEACTION class="SetNextForCompletedReturnItemRoad"/>
+        <LANEACTION class="FindExternalOrderItemInTransactionAisle"/>
+        <LANEACTION class="SetReturnExternalOrderItemRoad" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+        <LANEACTION class="ValidateSerialNumberAisle"/>
+        <!-- modified by vivek -->
+        <LANEACTION class="GDYNEnteredLoyaltyIDRoad" package="com.gdyn.orpos.pos.services.returns.returnitem" />
+        
+        <LETTER name="Cancel"/>
+        <LETTER name="Continue"/>
+        <LETTER name="Done"/>
+        <LETTER name="Failure"/>
+        <LETTER name="Clear"/>
+        <LETTER name="CheckSize"/>
+        <LETTER name="ActivationCancelled"/>
+        <LETTER name="GCInquiry"/>
+        <LETTER name="GiftReceipt"/>
+        <LETTER name="IDError"/>
+        <LETTER name="Invalid"/>
+        <LETTER name="Kit"/>
+        <LETTER name="Next"/>
+        <LETTER name="No"/>
+        <LETTER name="Ok"/>
+        <LETTER name="Retry"/>
+        <LETTER name="Build"/>
+        <LETTER name="Override"/>
+        <LETTER name="PriceCode"/>
+        <LETTER name="ReturnItem"/>
+        <LETTER name="SalesAssociateFailure"/>
+        <LETTER name="ShowItem"/>
+        <LETTER name="Success"/>
+        <LETTER name="Search"/>
+        <LETTER name="Size"/>
+        <LETTER name="Undo"/>
+        <LETTER name="UnitOfMeasure"/>
+        <LETTER name="Yes"/>
+        <LETTER name="ExternalOrder"/>
+        <LETTER name="Required"/>
+        <LETTER name="NotRequired"/>
+        <LETTER name="CheckAccess"/>
+
+        <SHUTTLE class="SecurityOverrideLaunchShuttle" package="oracle.retail.stores.pos.services.admin.security.common"/>
+        <SHUTTLE class="ShowKitComponentsLaunchShuttle"/>
+        <SHUTTLE class="ShowKitComponentsReturnShuttle"/>
+        <SHUTTLE class="UINLookUpLaunchShuttle"/>
+        <SHUTTLE class="UINLookUpReturnShuttle"/>
+        <SHUTTLE class="ModifyItemSerialNumberLaunchShuttle"/>
+        <SHUTTLE class="ModifyItemSerialNumberReturnShuttle"/>
+
+        <SIGNAL  class="IsGiftReceiptItem" package="oracle.retail.stores.pos.services.returns.returnitem"/>
+        <SIGNAL  class="IsNotGiftReceiptItem" package="oracle.retail.stores.pos.services.returns.returnitem"/>
+        <SIGNAL  class="IsThereAnotherItemSignal" />
+        <SIGNAL  class="IsThereNotAnotherItemSignal" />
+        <SIGNAL  class="IsFirstItemInReturnListSignal"/>
+        <SIGNAL  class="IsUINScanEnabledSignal" package="oracle.retail.stores.pos.services.common"/>
+        <SIGNAL  class="IsUINScanDisabledSignal" package="oracle.retail.stores.pos.services.common"/>
+        <SIGNAL  class="IsExternalOrderReturnSignal" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+
+        <SITEACTION class="CheckForExternalOrderSite"/>
+        <SITEACTION class="AcceptRestockingFeeSite" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+        <SITEACTION class="ApplyRestockingFeeSite" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+        <SITEACTION class="CheckAccessSite" package="oracle.retail.stores.pos.services.admin.security.common"/>
+        <SITEACTION class="CheckForKitHeaderItemSite"/>
+        <SITEACTION class="EnterItemInfoSite" package="oracle.retail.stores.pos.services.common"/>
+        <SITEACTION class="EnterItemPriceCodeInfoSite" package="oracle.retail.stores.pos.services.returns.returnitem"/>
+        <SITEACTION class="EnterReturnItemInformationSite" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+        <SITEACTION class="EnterReturnItemSite"/>
+        <SITEACTION class="EnterItemSizeSite" package="oracle.retail.stores.pos.services.common"/>
+        <SITEACTION class="GetSalesAssociateSite"/>
+        <SITEACTION class="EnterPriceCodeSite"/>
+        <SITEACTION class="LookupItemSite" package="oracle.retail.stores.pos.services.common"/>
+        <SITEACTION class="LookupSerialisedItemSite" />
+        <SITEACTION class="DetermineReturnTaxSite"/>
+        <SITEACTION class="ProcessExternalOrderSite"/>
+        <SITEACTION class="CheckSerialNumberRequiredSite"/>
+        <SITEACTION class="EnterSerialNumberSite"/>
+        <SITEACTION class="GDYNDetermineAccessNonRetrievedReturnSite" package="com.gdyn.orpos.pos.services.returns.returnitem"/>
+        <!-- modified by Vivek to add new site -->
+        <SITEACTION class="GDYNEnterOriginalLoyaltyIdSite" package="com.gdyn.orpos.pos.services.returns.returnitem"/>
+        <SITEACTION class="GDYNValidateLoyaltyIdSite" package="com.gdyn.orpos.pos.services.returns.returnitem"/>
+        
+
+    </SERVICECODE>
+    <MAP>
+        <REGION  region="SERVICE" startsite="CheckForExternalOrder">
+
+            <SITE  name="CheckForExternalOrder" siteaction="CheckForExternalOrderSite">
+                <ROAD
+                    name="CheckForExternalOrderNext"
+                    letter="Next"
+                    destination="DetermineAccessNonRetrievedReturn">
+                 </ROAD>
+                <ROAD
+                    name="ExternalOrderFound"
+                    letter="ExternalOrder"
+                    destination="ProcessExternalOrder">
+                </ROAD>
+            </SITE>
+            
+            <SITE  name="DetermineAccessNonRetrievedReturn" siteaction="GDYNDetermineAccessNonRetrievedReturnSite">
+                <ROAD
+                    name="NoReciptReturn"
+                    letter="Continue"
+                    destination="EnterOriginalLoyaltyID"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CheckAccessNonRetrievedReturn"
+                    letter="CheckAccess"
+                    destination="NonRetrievedReturnCheckSecurityAccess"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            
+            <SITE  name="NonRetrievedReturnCheckSecurityAccess" siteaction="CheckAccessSite">
+                <ROAD
+                    name="NoAccess"
+                    letter="Override"
+                    destination="NonRetrievedReturnSecurityOverrideStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="AccessGranted"
+                    letter="Continue"
+                    destination="EnterOriginalLoyaltyID"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <STATION
+                name="NonRetrievedReturnSecurityOverrideStation"
+                servicename="security.override.override"
+                targettier="CURRENTTIER"
+                launchshuttle="SecurityOverrideLaunchShuttle">
+                <ROAD
+                    name="SecurityOverrideSucceded"
+                    letter="Success"
+                    destination="EnterOriginalLoyaltyID"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SecurityOverrideFailed"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SecurityOverrideCancelled"
+                    letter="Cancel"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <!-- starts modification by Vivek -->
+            <SITE  name="EnterOriginalLoyaltyID" siteaction="GDYNEnterOriginalLoyaltyIdSite">
+                <ROAD
+                    name="LoyaltyEntered"
+                    letter="Next"
+                    laneaction="GDYNEnteredLoyaltyIDRoad"
+                    destination="ValidateLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="LoyaltyNotEnabled"
+                    letter="Continue"
+                    destination="EnterReturnItem"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+            </SITE>      
+            <SITE  name="ValidateLoyaltyIdBeforeSale" siteaction="GDYNValidateLoyaltyIdSite">
+                <AISLE
+                    name="ValidationSuccess"
+                    letter="Success"
+                    laneaction="ContinueConversionAisle">
+                    <COMMENT >
+                        This aisle is traversed to convert the current letter
+                        to cancel
+                    </COMMENT>
+                </AISLE>
+                <ROAD
+                    name="LoyaltyValidated"
+                    letter="Continue"
+                    destination="EnterReturnItem"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="LoyaltyIdValidateFailed"
+                    letter="Ok"
+                    destination="EnterOriginalLoyaltyID"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD> 
+             </SITE>    
+             <!-- End Modification by Vivek -->      
+            <SITE  name="EnterReturnItem" siteaction="EnterReturnItemSite">
+                <AISLE
+                    name="NextEnterReturnItem"
+                    letter="Next"
+                    laneaction="GetReturnItemEnteredAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelReturnItemEntered"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="ContinueEnterReturnItem"
+                    letter="Continue"
+                    destination="LookupItem">
+                </ROAD>
+                <ROAD
+                    name="DoneEnteringReturnItems"
+                    letter="Success"
+                    laneaction="SetNextReturnItemRoad"
+                    destination="EnterReturnItemInformation">
+                </ROAD>
+                <ROAD
+                    name="FailureEnterReturnItem"
+                    letter="Failure"
+                    destination="Final">
+                </ROAD>
+                <ROAD
+                    name="InvalidEnterReturnItem"
+                    letter="Invalid"
+                    destination="EnterReturnItem">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterReturnItem"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="Final">
+                </ROAD>
+                <ROAD
+                    name="ClearReturnItems"
+                    letter="Clear"
+                    laneaction="DeleteItemRoad"
+                    destination="EnterReturnItem">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="ProcessExternalOrder" siteaction="ProcessExternalOrderSite">
+                <ROAD
+                    name="ProcessExternalOrderNext"
+                    letter="Continue"
+                    destination="LookupItem">
+                 </ROAD>
+                <ROAD
+                    name="ProcessExternalOrderSuccess"
+                    letter="Success"
+                    laneaction="SetNextReturnItemRoad"
+                    destination="EnterReturnItemInformation">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="LookupItem" siteaction="LookupItemSite">
+                <AISLE
+                    name="CheckItemReturnable"
+                    letter="Success"
+                    laneaction="CheckItemReturnableAisle">
+                </AISLE>
+                <!-- Gift Card PLU items are not returnable.  The LookupItemSite is a
+                     common site and mails a "GCInquiry" letter when it finds a Gift Card 
+                     PLU. In the case of item returns this is the same as a "Success" letter. -->
+                <AISLE
+                    name="GiftCardInquiry"
+                    letter="GCInquiry"
+                    laneaction="CheckItemReturnableAisle">
+                </AISLE>
+                <AISLE
+                    name="CheckForItemSize"
+                    letter="CheckSize"
+                    laneaction="CheckIfSizeRequiredAisle">
+                </AISLE>
+                <AISLE
+                    name="CheckUINItemReturnable"
+                    letter="Next"
+                    laneaction="CheckItemReturnableAisle">
+                </AISLE>
+                <AISLE
+                    name="UnitOfMeasureItemFound"
+                    letter="UnitOfMeasure"
+                    laneaction="CheckItemReturnableAisle">
+                    <LIGHT  signal="IsNotGiftReceiptItem"/>
+                </AISLE>
+                <ROAD
+                    name="ItemNotReturnable"
+                    letter="Invalid"
+                    destination="EnterReturnItem">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="ItemNotReturnableExternalOrder"
+                    letter="Invalid"
+                    destination="Final">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="GiftReceiptUOMItemFound"
+                    letter="UnitOfMeasure"
+                    destination="EnterPriceCode">
+                    <LIGHT  signal="IsGiftReceiptItem"/>
+                </ROAD>
+                <ROAD
+                    name="RequestSizeInfo"
+                    letter="Size"
+                    destination="EnterItemSize">
+                </ROAD>
+                <ROAD
+                    name="ContinueLookupItem"
+                    letter="Continue"
+                    destination="CheckForKitHeader">
+                    <LIGHT  signal="IsNotGiftReceiptItem"/>
+                </ROAD>
+                <ROAD
+                    name="ContinueLookupPriceCode"
+                    letter="Continue"
+                    destination="EnterPriceCode">
+                    <LIGHT  signal="IsGiftReceiptItem"/>
+                </ROAD>
+                <ROAD
+                    name="FailureLookupItem"
+                    letter="Failure"
+                    destination="EnterItemInformation">
+                    <LIGHT  signal="IsUINScanDisabledSignal"/>
+                </ROAD>
+                <ROAD
+                    name="UINLookup"
+                    letter="Failure"
+                    destination="UINLookUpStation">
+                    <LIGHT  signal="IsUINScanEnabledSignal"/>
+                </ROAD>
+                <ROAD
+                    name="GiftReceiptFailureLookupItem"
+                    letter="GiftReceipt"
+                    destination="EnterItemPriceCodeInformation">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="EnterItemSize" siteaction="EnterItemSizeSite">
+                <AISLE
+                    name="NextEnterReturnItem"
+                    letter="Next"
+                    laneaction="ValidateItemSizeAisle">
+                </AISLE>
+                <ROAD
+                    name="SuccessEnterItemSize"
+                    letter="Search"
+                    destination="CheckForKitHeader">
+                    <LIGHT  signal="IsNotGiftReceiptItem"/>
+                </ROAD>
+                <ROAD
+                    name="LookupPriceCode"
+                    letter="Search"
+                    destination="EnterPriceCode">
+                    <LIGHT  signal="IsGiftReceiptItem"/>
+                </ROAD>
+                <ROAD
+                    name="FailureEnterItemSize"
+                    letter="Failure"
+                    destination="EnterItemInformation">
+                </ROAD>
+                <ROAD
+                    name="DoneEnterItemSize"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="Final">
+                   <LIGHT  signal="IsFirstItemInReturnListSignal" />
+                </ROAD>
+                <ROAD
+                    name="RetryEnterItem"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="EnterReturnItem">
+                    <LIGHT  signal="IsFirstItemInReturnListSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="CancelEnterItemSize"
+                    letter="Cancel"
+                    destination="Final">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="CheckForKitHeader" siteaction="CheckForKitHeaderItemSite">
+                <ROAD
+                    name="KitHeaderItemFound"
+                    letter="Kit"
+                    destination="ShowKitComponents">
+                </ROAD>
+                <ROAD
+                    name="NonKitHeaderItem"
+                    letter="Next"
+                    destination="CheckSerialNumberRequired">
+                </ROAD>
+            </SITE>
+
+            <STATION
+                name="ShowKitComponents"
+                servicename="returns.returnkit.returnkit"
+                targettier="CURRENTTIER"
+                launchshuttle="ShowKitComponentsLaunchShuttle"
+                returnshuttle="ShowKitComponentsReturnShuttle">
+                <ROAD
+                    name="KitComponentsSuccessful"
+                    letter="Success"
+                    destination="CheckSerialNumberRequired">
+                </ROAD>
+                <ROAD
+                    name="KitComponentsFailed"
+                    letter="Failure"
+                    destination="Final">
+                </ROAD>
+                <ROAD
+                    name="UndoReturnKitComponent"
+                    letter="Undo"
+                    destination="EnterReturnItem">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="KitComponentsUndoExternalOrder"
+                    letter="Undo"
+                    destination="Final">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="CancelReturnKitComponent"
+                    letter="Cancel"
+                    destination="Final">
+                </ROAD>
+            </STATION>
+
+            <SITE  name="CheckSerialNumberRequired" siteaction="CheckSerialNumberRequiredSite">
+                <ROAD
+                    name="SerialNumberRequired"
+                    letter="Required"
+                    destination="EnterSerialNumber">
+                </ROAD>
+                 <ROAD
+                     name="SerialNumberNotRequired"
+                     letter="NotRequired"
+                     laneaction="UpdateReturnItemListRoad"
+                     destination="EnterReturnItem">
+                     <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                 </ROAD>
+                 <ROAD
+                     name="ExternalOrderSerialNumberNotRequired"
+                     letter="NotRequired"
+                     laneaction="UpdateReturnItemListRoad"
+                     destination="ProcessExternalOrder">
+                     <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                 </ROAD>
+            </SITE>
+            
+            <SITE  name="EnterSerialNumber" siteaction="EnterSerialNumberSite">
+                <AISLE
+                    name="NextEnterSerialNumberExternalOrder"
+                    letter="Next"
+                    laneaction="ValidateSerialNumberAisle">
+                </AISLE>
+                <ROAD
+                    name="ContinueEnterSerialNumber"
+                    letter="Continue"
+                    laneaction="UpdateReturnItemListRoad"
+                    destination="EnterReturnItem">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="ContinueEnterSerialNumberExternalOrder"
+                    letter="Continue"
+                    laneaction="UpdateReturnItemListRoad"
+                    destination="ProcessExternalOrder">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" />
+                </ROAD>
+                <ROAD
+                    name="RetrySerialNumberFailedValidation"
+                    letter="Retry"
+                    destination="EnterSerialNumber">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterSerialNumber"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="Final">
+                   <LIGHT  signal="IsFirstItemInReturnListSignal" />
+                </ROAD>
+                <ROAD
+                    name="UndoEnterSerialNumber"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="EnterReturnItem">
+                    <LIGHT  signal="IsFirstItemInReturnListSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="CancelEnterItemSize"
+                    letter="Cancel"
+                    destination="Final">
+                </ROAD>
+            </SITE>
+            
+            <!-- Collect the price from a gift receipt. -->
+            <SITE  name="EnterPriceCode" siteaction="EnterPriceCodeSite">
+                 <AISLE
+                    name="CancelEnterPriceCode"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="ContinueEnterPriceCode"
+                    letter="Next"
+                    laneaction="SuccessLookupPriceCodeRoad"
+                    destination="CheckForKitHeader">
+                 </ROAD>
+                <ROAD
+                    name="FailureEnterPriceCode"
+                    letter="Failure"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="Final">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterPriceCode"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="EnterReturnItem">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="UndoEnterPriceCodeExternalOrder"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="Final">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+            </SITE>
+
+            <!-- Collects the price from an item not found in a gift receipt. -->
+            <SITE  name="EnterItemPriceCodeInformation" siteaction="EnterItemPriceCodeInfoSite">
+                <AISLE
+                    name="AcceptEnterItemInformation"
+                    letter="Next"
+                    laneaction="ItemPriceCodeInfoEnteredAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelEnterItemInformation"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="UndoEnterItemInformation"
+                    letter="Undo"
+                    destination="EnterReturnItem"
+                    laneaction="UndoEnterReturnItemRoad">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="UndoEnterItemInformationExternalOrder"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="Final">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="ContinueEnterItemInformation"
+                    letter="Continue"
+                    destination="CheckSerialNumberRequired">
+                </ROAD>
+                <ROAD
+                    name="ErrorOkEnterItemInformation"
+                    letter="Ok"
+                    destination="EnterItemPriceCodeInformation">
+                </ROAD>
+                <ROAD
+                    name="FailureEnterItemInformation"
+                    letter="Failure"
+                    destination="Final">
+                </ROAD>
+            </SITE>
+
+            <!-- Collects information for not found items -->
+            <SITE  name="EnterItemInformation" siteaction="EnterItemInfoSite">
+                <AISLE
+                    name="AcceptEnterItemInformation"
+                    letter="Next"
+                    laneaction="ItemInfoEnteredAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelEnterItemInformation"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="UndoEnterItemInformation"
+                    letter="Undo"
+                    destination="EnterReturnItem"
+                    laneaction="UndoEnterReturnItemRoad">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="UndoEnterItemInformationExternalOrder"
+                    letter="Undo"
+                    destination="Final"
+                    laneaction="UndoEnterReturnItemRoad">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="InvalidItem"
+                    letter="Invalid"
+                    destination="EnterReturnItem"
+                    laneaction="UndoEnterReturnItemRoad">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="InvalidItemExternalOrder"
+                    letter="Invalid"
+                    destination="Final"
+                    laneaction="UndoEnterReturnItemRoad">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="ContinueEnterItemInformation"
+                    letter="Continue"
+                    destination="CheckSerialNumberRequired">
+                </ROAD>
+                <ROAD
+                    name="ErrorOkEnterItemInformation"
+                    letter="Ok"
+                    destination="EnterItemInformation">
+                </ROAD>
+                <ROAD
+                    name="FailureEnterItemInformation"
+                    letter="Failure"
+                    destination="Final">
+                </ROAD>
+            </SITE>
+
+            <!-- Looks up not found items in SIM -->
+            <STATION
+                name="UINLookUpStation"
+                servicename="services.uinlookup.uinlookup"
+                targettier="CURRENTTIER"
+                launchshuttle="UINLookUpLaunchShuttle"
+                returnshuttle="UINLookUpReturnShuttle">
+
+               <ROAD  name="OneItemSelected"
+                      letter="Next"
+                      destination="LookupSerialisedItem">
+               </ROAD>
+               <ROAD  name="OneItemFound"
+                      letter="OneItemFound"
+                      destination="LookupSerialisedItem">
+               </ROAD>
+                <ROAD name="UINLookupError"
+                      letter="Error"
+                      destination="EnterReturnItem">
+               </ROAD>
+               <ROAD name="UINLookupFailed"
+                      letter="Failure"
+                      destination="EnterReturnItem">
+                      <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+               </ROAD>
+               <ROAD name="UINLookupFailedExternalOrder"
+                      letter="Failure"
+                      destination="Final">
+                      <LIGHT  signal="IsExternalOrderReturnSignal"/>
+               </ROAD>
+               <ROAD name="UINLookupCancel"
+                      letter="Cancel"
+                      destination="Final">
+               </ROAD>
+            </STATION>
+
+			<!-- This performs checks on the items retrieved from SIM interface
+			     which is called from the UINLookUpStation -->
+            <SITE  name="LookupSerialisedItem" siteaction="LookupSerialisedItemSite">
+                <AISLE
+                    name="CheckForItemSize"
+                    letter="CheckSize"
+                    laneaction="CheckIfSizeRequiredAisle">
+                </AISLE>
+                <AISLE
+                    name="UnitOfMeasureItemFound"
+                    letter="UnitOfMeasure"
+                    laneaction="CheckItemReturnableAisle">
+                    <LIGHT  signal="IsNotGiftReceiptItem"/>
+                </AISLE>
+                <ROAD
+                    name="GiftReceiptUOMItemFound"
+                    letter="UnitOfMeasure"
+                    destination="EnterPriceCode">
+                    <LIGHT  signal="IsGiftReceiptItem"/>
+                </ROAD>
+                <ROAD
+                    name="ItemNotReturnable"
+                    letter="Invalid"
+                    destination="EnterReturnItem">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="ItemNotReturnableExternalOrder"
+                    letter="Invalid"
+                    destination="Final">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="RequestSizeInfo"
+                    letter="Size"
+                    destination="EnterItemSize">
+                </ROAD>
+                <ROAD
+                    name="ContinueLookupItem"
+                    letter="Continue"
+                    destination="CheckForKitHeader">
+                    <LIGHT  signal="IsNotGiftReceiptItem"/>
+                </ROAD>
+                <ROAD
+                    name="ContinueLookupPriceCode"
+                    letter="Continue"
+                    destination="EnterPriceCode">
+                    <LIGHT  signal="IsGiftReceiptItem"/>
+                </ROAD>
+                <ROAD
+                    name="GiftReceiptFailureLookupItem"
+                    letter="GiftReceipt"
+                    destination="EnterItemPriceCodeInformation">
+                </ROAD>
+            </SITE>
+
+			<!-- The part of this tour loops through the list of items that were looked up
+			     due from the id supplied by the user or supplied by an external order;
+			     this second loop collects return item information including restocking
+			     fee if required -->
+            <SITE  name="EnterReturnItemInformation" siteaction="EnterReturnItemInformationSite">
+                <AISLE
+                    name="AcceptEnterReturnItemInformation"
+                    letter="Next"
+                    laneaction="GetReturnItemInformationAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelReturnItemInformation"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <AISLE
+                    name="ContinueEnterReturnItemInformation"
+                    letter="Continue"
+                    laneaction="ValidateReturnSerialQuantityAisle">
+                </AISLE>
+                <ROAD
+                    name="ValidationErrorOkEnterReturnItemInformation"
+                    letter="Ok"
+                    destination="EnterReturnItemInformation">
+                </ROAD>
+                <ROAD
+                    name="SuccessEnterReturnItemInformation"
+                    letter="Success"
+                    destination="GetSalesAssociate">
+                </ROAD>
+                <ROAD
+                    name="InvalidReturnItem"
+                    letter="Invalid"
+                    destination="AcceptRestockingFee">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterReturnInformation"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="EnterReturnItem">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="UndoEnterReturnInformationExternalOrder"
+                    letter="Undo"
+                    laneaction="UndoEnterReturnItemRoad"
+                    destination="Final">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="FailureEnterReturnItemInformation"
+                    letter="Failure"
+                    destination="Final">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="GetSalesAssociate" siteaction="GetSalesAssociateSite">
+                <ROAD
+                    name="SuccessAssociateLookup"
+                    letter="Success"
+                    destination="ApplyRestockingFee">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="ApplyRestockingFee" siteaction="ApplyRestockingFeeSite">
+                <AISLE
+                    name="RestockingFeeApplied"
+                    letter="Yes"
+                    laneaction="SuccessConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="RestockingFeeDeclined"
+                    letter="No"
+                    destination="CheckAccess">
+                </ROAD>
+                <ROAD
+                    name="RestockingFeeAccepted"
+                    letter="Success"
+                    destination="AcceptRestockingFee">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="AcceptRestockingFee" siteaction="AcceptRestockingFeeSite">
+                <ROAD
+                    name="RestockingFeeSuccessful"
+                    letter="Success"
+                    laneaction="SetNextForCompletedReturnItemRoad"
+                    destination="EnterReturnItemInformation">
+                    <LIGHT  signal="IsThereAnotherItemSignal"/>
+                </ROAD>
+                <ROAD
+                    name="RestockingFeeSuccessfulFinal"
+                    letter="Success"
+                    laneaction="ReturnSuccessProcessingRoad"
+                    destination="DetermineTax">
+                    <LIGHT  signal="IsThereAnotherItemSignal" negate="Y"/>
+                </ROAD>
+            </SITE>
+
+            <SITE  name="CheckAccess" siteaction="CheckAccessSite">
+                <AISLE
+                    name="ContinueAccessGranted"
+                    letter="Continue"
+                    laneaction="SuccessConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="NoAccess"
+                    letter="Override"
+                    destination="SecurityOverrideStation">
+                </ROAD>
+
+                <ROAD
+                    name="AccessGranted"
+                    letter="Success"
+                    laneaction="ResetRestockingFeeRoad"
+                    destination="DetermineTax">
+                   <LIGHT  signal="IsThereAnotherItemSignal" negate="Y"/>
+
+                </ROAD>
+                <ROAD
+                    name="RestockingFeeSuccessful"
+                    letter="Success"
+                    laneaction="ResetRestockingFeeAndSetNextItemRoad"
+                    destination="EnterReturnItemInformation">
+                    <LIGHT  signal="IsThereAnotherItemSignal"/>
+                </ROAD>
+            </SITE>
+
+            <STATION
+                name="SecurityOverrideStation"
+                servicename="security.override.override"
+                targettier="CURRENTTIER"
+                launchshuttle="SecurityOverrideLaunchShuttle">
+                <ROAD
+                    name="SecurityOverrideSucceded"
+                    letter="Success"
+                    laneaction="ResetRestockingFeeRoad"
+                    destination="DetermineTax">
+                    <LIGHT  signal="IsThereAnotherItemSignal" negate="Y"/>
+                </ROAD>
+               <ROAD
+                    name="SecurityOverrideRestockingFeeSuccessful"
+                    letter="Success"
+                    laneaction="ResetRestockingFeeAndSetNextItemRoad"
+                    destination="EnterReturnItemInformation">
+                    <LIGHT  signal="IsThereAnotherItemSignal"/>
+                </ROAD>
+                <ROAD
+                    name="SecurityOverrideFailed"
+                    letter="Failure"
+                    destination="AcceptRestockingFee">
+                </ROAD>
+                <ROAD
+                    name="SecurityOverrideCancelled"
+                    letter="Cancel"
+                    destination="Final">
+                </ROAD>
+            </STATION>
+
+            <SITE  name="DetermineTax" siteaction="DetermineReturnTaxSite">
+                <ROAD
+                    name="DetermineTaxDone"
+                    letter="Success"
+                    destination="Final">
+                </ROAD>
+            </SITE>
+
+            <SYSTEMSITE  name="Final" action="RETURN"/>
+        </REGION>
+    </MAP>
+</SERVICE>

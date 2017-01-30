@@ -1,0 +1,1319 @@
+<?xml version='1.0' ?>
+<!--
+//
+// Copyright (c) 2012-2013, Starmount and Groupe Dynamite.
+// All rights reserved.
+//
+-->
+<!DOCTYPE SERVICE SYSTEM "classpath://oracle/retail/stores/foundation/tour/dtd/tourguide.dtd">
+
+<SERVICE
+    name="returnoptions"
+    package="oracle.retail.stores.pos.services.returns.returnoptions"
+    tourcam="ON">
+    <COMMENT >
+        This services routes the user to the various services
+        available through the Return Options screen.
+    </COMMENT>
+    <CARGO  class="GDYNReturnOptionsCargo" package="com.gdyn.orpos.pos.services.returns.returnoptions" />
+    <SERVICECODE>
+        <LANEACTION class="CheckAccessAisle" package="oracle.retail.stores.pos.services.admin.security.common"/>
+        <LANEACTION class="CompleteCreditCardInfoAisle"/>
+        <LANEACTION class="DateRangeEnteredAisle"/>
+        <LANEACTION class="FailureConversionAisle" package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="GiftReceiptSelectedRoad" package="oracle.retail.stores.pos.services.returns.returnoptions"/>
+        <LANEACTION class="ItemNumberEnteredAisle"/>
+        <LANEACTION class="PersonalIDInfoEnteredAisle"/>
+        <LANEACTION class="SerialNumberEnteredAisle"/>
+        <LANEACTION class="StoreNumberEnteredAisle"/>
+        <LANEACTION class="TokenNotRetrievedDialogAisle"/>
+        <LANEACTION class="TransReentryRoad"/>
+        <LANEACTION class="TransactionNotFoundRoad"/>
+        <LANEACTION class="UndoSelectedRoad"/>
+        <LANEACTION class="ValidateCheckInfoAisle"/>
+        <LANEACTION class="ValidateCreditCardInfoAisle"/>
+        <LANEACTION class="ValidateGiftCardInfoAisle"/>
+        <LANEACTION class="ValidateItemNumberAisle"/>
+        <LANEACTION class="ValidateItemSizeAisle"/>
+        <LANEACTION class="ValidateTransactionIDAisle" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+
+        <LETTER name="Cancel"/>
+        <LETTER name="Check"/>
+        <LETTER name="Continue"/>
+        <LETTER name="Credit"/>
+        <LETTER name="Customer"/>
+        <LETTER name="DateRange"/>
+        <LETTER name="Failure"/>
+        <LETTER name="GiftCard"/>
+        <LETTER name="GiftReceipt"/>
+        <LETTER name="Invalid"/>
+        <LETTER name="Link"/>
+        <LETTER name="Next"/>
+        <LETTER name="No"/>
+        <LETTER name="NoReceipt"/>
+        <LETTER name="Offline"/>
+        <LETTER name="Ok"/>
+        <LETTER name="Override"/>
+        <LETTER name="Retry"/>
+        <LETTER name="ReturnItem"/>
+        <LETTER name="Search"/>
+        <LETTER name="SerialNumber"/>
+        <LETTER name="Size"/>
+        <LETTER name="StoreNumber"/>
+        <LETTER name="Success"/>
+        <LETTER name="TooManyTransactions"/>
+        <LETTER name="Undo"/>
+        <LETTER name="Validate"/>
+        <LETTER name="Yes"/>
+
+        <SHUTTLE class="LinkCustomerLaunchShuttle"/>
+        <SHUTTLE class="LinkCustomerReturnShuttle"/>
+        <SHUTTLE class="ReturnCustomerLaunchShuttle"/>
+        <SHUTTLE class="ReturnCustomerReturnShuttle"/>
+        <SHUTTLE class="ReturnFindTransLaunchShuttle"/>
+        <SHUTTLE class="GDYNReturnFindTransReturnShuttle" package="com.gdyn.orpos.pos.services.returns.returnoptions" />
+        <SHUTTLE class="ReturnItemLaunchShuttle"/>
+        <SHUTTLE class="GDYNReturnItemReturnShuttle"  package="com.gdyn.orpos.pos.services.returns.returnoptions" />
+        <SHUTTLE class="SecurityOverrideLaunchShuttle" package="oracle.retail.stores.pos.services.admin.security.common"/>
+
+        <SIGNAL  class="IsExternalOrderReturnSignal" package="oracle.retail.stores.pos.services.returns.returncommon"/>
+        <SIGNAL  class="IsNoSearchCriteriaSignal"/>
+        <SIGNAL  class="IsOfflineSignal" package="oracle.retail.stores.pos.services.common"/>
+        <SIGNAL  class="IsOnlineSignal" package="oracle.retail.stores.pos.services.common"/>
+        <SIGNAL  class="IsSearchCriteriaSignal"/>
+        <SIGNAL  class="ReturnByTokenSignal"/>
+        <SIGNAL  class="TransReentrySignal"/>
+
+        <SITEACTION class="CheckAccessSite" package="oracle.retail.stores.pos.services.admin.security.common"/>
+        <SITEACTION class="CheckForCustomerRequiredSite"/>
+        <SITEACTION class="CheckForPersonalIDRequiredSite"/>
+        <SITEACTION class="CompleteCreditInfoSite"/> 
+        <SITEACTION class="GDYNCreateAndUpdateTransactionSite" package="com.gdyn.orpos.pos.services.returns.returnoptions" />
+        <SITEACTION class="DisplayExternalOrderDialogSite"/>
+        <SITEACTION class="DisplayReturnOptionsSite"/>
+        <SITEACTION class="DisplayTransactionSearchOptionsSite"/>
+        <SITEACTION class="EnterCheckInfoSite"/>
+        <SITEACTION class="EnterCreditInfoSite"/>
+        <SITEACTION class="EnterDateRangeSite"/>
+        <SITEACTION class="EnterGiftCardInfoSite"/>
+        <SITEACTION class="EnterItemSizeSite" package="oracle.retail.stores.pos.services.common"/>
+        <SITEACTION class="EnterSerialNumberSite"/>
+        <SITEACTION class="EnterStoreNumberSite"/>
+        <SITEACTION class="GetTenderIDTokenSite"/>
+
+    </SERVICECODE>
+    <MAP >
+        <REGION  region="SERVICE" startsite="CheckSecurityAccess">
+            <SITE  name="CheckSecurityAccess" siteaction="CheckAccessSite">
+                <ROAD
+                    name="NoAccess"
+                    letter="Override"
+                    destination="SecurityOverrideStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="AccessGranted"
+                    letter="Continue"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <STATION
+                name="SecurityOverrideStation"
+                servicename="security.override.override"
+                targettier="CURRENTTIER"
+                launchshuttle="SecurityOverrideLaunchShuttle">
+                <ROAD
+                    name="SecurityOverrideSucceded"
+                    letter="Success"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SecurityOverrideFailed"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SecurityOverrideCancelled"
+                    letter="Cancel"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+
+            <SITE  name="DisplayExternalOrderDialog" siteaction="DisplayExternalOrderDialogSite">
+                <ROAD
+                    name="NoExternalOrder"
+                    letter="Continue"
+                    destination="DisplayReturnOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="ExternalOrderReturnNotComplete"
+                    letter="Ok"
+                    destination="DisplayReturnOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="DisplayExternalOrderDialogCustomer"
+                    letter="Customer"
+                    destination="CheckForCustomerRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="DisplayReturnOptions" siteaction="DisplayReturnOptionsSite">
+                <AISLE
+                    name="UndoReturnOptions"
+                    letter="Undo"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelReturnOptions"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <AISLE
+                    name="NextTransactionIDEntered"
+                    letter="Next"
+                    laneaction="ValidateTransactionIDAisle">
+                </AISLE>
+                <ROAD
+                    name="OkPressedOnValidateTransactionIDError"
+                    letter="Ok"
+                    destination="DisplayReturnOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="ContinueTransactionIDEntered"
+                    letter="Continue"
+                    destination="ReturnFindTransStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <LIGHT  signal="TransReentrySignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="ReturnItemReadTransactions"
+                    laneaction="TransReentryRoad"
+                    letter="Continue"
+                    destination="ReturnItemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <LIGHT  signal="TransReentrySignal"/>
+                </ROAD>
+                <ROAD
+                    name="NoReceiptSelected"
+                    letter="NoReceipt"
+                    destination="ReturnItemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SearchSelected"
+                    letter="Search"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="GiftReceiptSelected"
+                    letter="GiftReceipt"
+                    laneaction="GiftReceiptSelectedRoad"
+                    destination="ReturnFindTransStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="FailureReturnOptions"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE  name="DisplayTransactionSearchOptions" siteaction="DisplayTransactionSearchOptionsSite">
+                <AISLE
+                    name="CancelDisplayTransactionSearch"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="UndoDisplayTransactionSearchOptions"
+                    letter="Undo"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CheckSelected"
+                    letter="Check"
+                    destination="EnterCheckInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CreditSelected"
+                    letter="Credit"
+                    destination="EnterCreditInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="ReturnByTokenSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="CreditSelected"
+                    letter="Credit"
+                    destination="GetTenderIDToken"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="ReturnByTokenSignal"/>
+                </ROAD>
+                <ROAD
+                    name="GiftCardSelected"
+                    letter="GiftCard"
+                    destination="EnterGiftCardInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CustomerSelected"
+                    letter="Customer"
+                    destination="ReturnCustomerStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="FailureDisplayTransactionSearchOptions"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="DateRangeSelected"
+                    letter="DateRange"
+                    destination="EnterDateRange"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="StoreNumberSelected"
+                    letter="StoreNumber"
+                    destination="EnterStoreNumber"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SerialNumberSelected"
+                    letter="SerialNumber"
+                    destination="EnterUIN"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="EnterUIN" siteaction="EnterSerialNumberSite">
+                <AISLE
+                    name="UINEntered"
+                    letter="Next"
+                    laneaction="SerialNumberEnteredAisle">
+                </AISLE>
+
+                <AISLE
+                    name="UINValidateItemNumber"
+                    letter="Validate"
+                    laneaction="ValidateItemNumberAisle">
+                </AISLE>
+
+                <ROAD
+                    name="EnterItemSize"
+                    letter="Size"
+                    destination="EnterItemSize"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+
+                <ROAD
+                    name="InvalidUINEntered"
+                    letter="Retry"
+                    destination="EnterUIN"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+
+                <ROAD
+                    name="FindTransactionsForSerialNumber"
+                    letter="Search"
+                    destination="ReturnFindTransStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+
+                <ROAD
+                    name="CanelUINSearch"
+                    letter="Canel"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoSerialNumber"
+                    letter="Undo"
+                    laneaction="UndoSelectedRoad"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureUINSearch"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="CheckForCustomerRequired" siteaction="CheckForCustomerRequiredSite">
+                <AISLE
+                    name="NoCheckForCustomerRequired"
+                    letter="No"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="ContinueCheckForPersonalIDRequired"
+                    letter="Continue"
+                    destination="CheckForPersonalIDRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="YesCheckForCustomerRequired"
+                    letter="Yes"
+                    destination="LinkCustomerStation2"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureCheckForCustomerRequired"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <STATION
+                name="LinkCustomerStation2"
+                servicename="customer.main.customermain"
+                targettier="APPLICATIONTIER"
+                launchshuttle="LinkCustomerLaunchShuttle"
+                returnshuttle="LinkCustomerReturnShuttle">
+                <ROAD
+                    name="CancelFindSelected"
+                    letter="Cancel"
+                    destination="CheckForCustomerRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CustomerLinked"
+                    letter="Continue"
+                    destination="CheckForPersonalIDRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CustomerLinked"
+                    letter="Link"
+                    destination="CheckForPersonalIDRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="UndoFindSelected"
+                    letter="Undo"
+                    destination="CheckForCustomerRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureCustomerReturn"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+
+            <SITE  name="CreateAndUpdateTransaction" siteaction="GDYNCreateAndUpdateTransactionSite">
+                <ROAD
+                    name="SuccessCreateAndUpdateTransaction"
+                    letter="Success"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureCreateAndUpdateTransaction"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="EnterStoreNumber" siteaction="EnterStoreNumberSite">
+                <AISLE
+                    name="StoreNumberEntered"
+                    letter="Next"
+                    laneaction="StoreNumberEnteredAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelStoreNumber"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="StoreNumberCustomerLinkNeeded"
+                    letter="Link"
+                    destination="LinkCustomerStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="StoreNumberCustomerAlreadyLinked"
+                    letter="Customer"
+                    destination="ReturnCustomerStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="FailureStoreNumber"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoStoreNumber"
+                    letter="Undo"
+                    laneaction="UndoSelectedRoad"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE  name="EnterDateRange" siteaction="EnterDateRangeSite">
+                <AISLE
+                    name="DateRangeEntered"
+                    letter="Next"
+                    laneaction="DateRangeEnteredAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelDateRange"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="DateRangeCustomerLinkNeeded"
+                    letter="Link"
+                    destination="LinkCustomerStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="DateRangeCustomerAlreadyLinked"
+                    letter="Customer"
+                    destination="ReturnCustomerStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="FailureDateRange"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoDateRange"
+                    letter="Undo"
+                    laneaction="UndoSelectedRoad"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="IncorrectDateRange"
+                    letter="Ok"
+                    destination="EnterDateRange"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <STATION
+                name="LinkCustomerStation"
+                servicename="customer.main.customermain"
+                targettier="APPLICATIONTIER"
+                launchshuttle="LinkCustomerLaunchShuttle"
+                returnshuttle="LinkCustomerReturnShuttle">
+                <ROAD
+                    name="CancelFindSelected"
+                    letter="Cancel"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CustomerOffline"
+                    letter="Offline"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CustomerLinked"
+                    letter="Continue"
+                    destination="CheckForPersonalIDRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="IsNoSearchCriteriaSignal"/>
+                </ROAD>
+                <ROAD
+                    name="CustomerReturn"
+                    letter="Continue"
+                    destination="ReturnCustomerStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="IsSearchCriteriaSignal"/>
+                </ROAD>
+                <ROAD
+                    name="UndoFindSelected"
+                    letter="Undo"
+                    destination="LastIndexed"
+                    tape="REWIND"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureCustomerReturn"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <SITE  name="CheckForPersonalIDRequired" siteaction="CheckForPersonalIDRequiredSite">
+                <AISLE
+                    name="PersonalIDInfoEntered"
+                    letter="Next"
+                    laneaction="PersonalIDInfoEnteredAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelPersonalIDRequired"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <AISLE
+                    name="PersonalIDRequiredYes"
+                    letter="Yes"
+                    laneaction="CheckAccessAisle">
+                </AISLE>
+                <ROAD
+                    name="PersonalIDOverride"
+                    letter="Override"
+                    destination="PersonalIDSecurityOverrideStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="PersonalIDNo"
+                    letter="No"
+                    destination="CheckForPersonalIDRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="PersonalIDContinue"
+                    letter="Continue"
+                    destination="CreateAndUpdateTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoPersonalID"
+                    letter="Undo"
+                    laneaction="UndoSelectedRoad"
+                    destination="DisplayReturnOptions"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailurePersonalIDRequired"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <STATION
+                name="PersonalIDSecurityOverrideStation"
+                servicename="security.override.override"
+                targettier="CURRENTTIER"
+                launchshuttle="SecurityOverrideLaunchShuttle">
+                <ROAD
+                    name="LicenceOverrideSucceded"
+                    letter="Success"
+                    destination="CreateAndUpdateTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="LicenceOverrideFailed"
+                    letter="Failure"
+                    destination="CheckForPersonalIDRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="LicenceOverrideCancelled"
+                    letter="Cancel"
+                    destination="CheckForPersonalIDRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <SITE  name="EnterCheckInfo" siteaction="EnterCheckInfoSite">
+                <AISLE
+                    name="ValidateCheckInfo"
+                    letter="Next"
+                    laneaction="ValidateCheckInfoAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelEnterCheckInfo"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <AISLE
+                    name="CheckValidateItemNumber"
+                    letter="Validate"
+                    laneaction="ValidateItemNumberAisle">
+                </AISLE>
+                <ROAD
+                    name="CheckItemNumberEntered"
+                    letter="Size"
+                    destination="EnterItemSize"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CheckItemNumberRetrieved"
+                    letter="Search"
+                    destination="ReturnFindTransStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CheckInvalidGiftCardEntered"
+                    letter="Retry"
+                    destination="EnterCheckInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterCheckInfo"
+                    letter="Undo"
+                    destination="LastIndexed"
+                    tape="REWIND"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureEnterCheckInfo"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE  name="EnterGiftCardInfo" siteaction="EnterGiftCardInfoSite">
+                <AISLE
+                    name="ValidateGiftCardInfo"
+                    letter="Next"
+                    laneaction="ValidateGiftCardInfoAisle">
+                </AISLE>
+                <AISLE
+                    name="GiftCardCancelEnterCreditCardInfo"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <AISLE
+                    name="GiftCardValidateItemNumber"
+                    letter="Validate"
+                    laneaction="ValidateItemNumberAisle">
+                </AISLE>
+                <ROAD
+                    name="CreditItemNumberEntered"
+                    letter="Size"
+                    destination="EnterItemSize"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CreditItemNumberRetrieved"
+                    letter="Search"
+                    destination="ReturnFindTransStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InvalidGiftCardEntered"
+                    letter="Retry"
+                    destination="EnterGiftCardInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterGiftCardInfo"
+                    letter="Undo"
+                    destination="LastIndexed"
+                    tape="REWIND"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureEnterGiftCardInfo"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE  name="EnterCreditInfo" siteaction="EnterCreditInfoSite">
+                <AISLE
+                    name="ValidateCreditCardInfo"
+                    letter="Next"
+                    laneaction="ValidateCreditCardInfoAisle">
+                </AISLE>
+                <AISLE
+                    name="CreditValidateItemNumber"
+                    letter="Validate"
+                    laneaction="ValidateItemNumberAisle">
+                </AISLE>
+                <AISLE
+                    name="CreditCancelEnterCreditCardInfo"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="CreditItemNumberEntered"
+                    letter="Size"
+                    destination="EnterItemSize"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CreditItemNumberRetrieved"
+                    letter="Search"
+                    destination="ReturnFindTransStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InvalidCreditCardEntered"
+                    letter="Retry"
+                    destination="EnterCreditInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterCreditCardInfo"
+                    letter="Undo"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureEnterCreditCardInfo"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="GetTenderIDToken" siteaction="GetTenderIDTokenSite">
+                <AISLE
+                    name="TokenNotRetrieved"
+                    letter="Failure"
+                    laneaction="TokenNotRetrievedDialogAisle">
+                </AISLE>
+                <ROAD
+                    name="TokenRetrieved"
+                    letter="Success"
+                    destination="CompleteCreditInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="SelectSearchOptions"
+                    letter="No"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ContinueToEnterCreditInfo"
+                    letter="Yes"
+                    destination="EnterCreditInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="CompleteCreditInfo" siteaction="CompleteCreditInfoSite">
+                <AISLE
+                    name="CompleteCreditCardInfo"
+                    letter="Next"
+                    laneaction="CompleteCreditCardInfoAisle">
+                </AISLE>
+                <AISLE
+                    name="ValidateItemNumber"
+                    letter="Validate"
+                    laneaction="ValidateItemNumberAisle">
+                </AISLE>
+                <AISLE
+                    name="CancelCompleteCreditInfo"
+                    letter="Cancel"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="SizeCompleteCreditInfo"
+                    letter="Size"
+                    destination="EnterItemSize"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ValidItemNumberEntered"
+                    letter="Search"
+                    destination="ReturnFindTransStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InvalidItemNumberEntered"
+                    letter="Retry"
+                    destination="CompleteCreditInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoCompleteCreditCardInfo"
+                    letter="Undo"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureEnterCreditCardInfo"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <SITE  name="EnterItemSize" siteaction="EnterItemSizeSite">
+                <AISLE
+                    name="ValidateItemSize"
+                    letter="Next"
+                    laneaction="ValidateItemSizeAisle">
+                </AISLE>
+                <ROAD
+                    name="ItemSizeEntered"
+                    letter="Search"
+                    destination="ReturnFindTransStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterItemSize"
+                    letter="Undo"
+                    destination="LastIndexed"
+                    tape="REWIND"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureEnterItemSize"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+
+            <STATION
+                name="ReturnCustomerStation"
+                servicename="returns.returncustomer.returncustomer"
+                targettier="CURRENTTIER"
+                launchshuttle="ReturnCustomerLaunchShuttle"
+                returnshuttle="ReturnCustomerReturnShuttle">
+                <AISLE
+                    name="OfflineReturnCustomerAisle"
+                    letter="Offline"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="ReadTransactionInvalidTransEntry"
+                    letter="Retry"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SuccessReturnCustomer"
+                    letter="Success"
+                    destination="CheckForPersonalIDRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="SuccessReturnCustomerExternalOrder"
+                    letter="Success"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="ReturnItemReturnCustomer"
+                    letter="ReturnItem"
+                    destination="ReturnItemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureReturnCustomer"
+                    letter="Failure"
+                    destination="DisplayReturnOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelReturnCustomer"
+                    letter="Cancel"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <COMMENT >
+                        This road is traversed when the user cancels from
+                        customer
+                    </COMMENT>
+                    <LIGHT  signal="IsOnlineSignal"/>
+                </ROAD>
+                <ROAD
+                    name="OfflineReturnCustomer"
+                    letter="Cancel"
+                    destination="ReturnItemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <COMMENT >
+                        This road is traversed when the system is offline.
+                        The user is brought to the return item station.
+                    </COMMENT>
+                    <LIGHT  signal="IsOfflineSignal"/>
+                </ROAD>
+                <ROAD
+                    name="UndoReturnCustomer"
+                    letter="Undo"
+                    destination="LastIndexed"
+                    tape="REWIND"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="ReturnItemStation"
+                servicename="returns.returnitem.returnitem"
+                targettier="CURRENTTIER"
+                launchshuttle="ReturnItemLaunchShuttle"
+                returnshuttle="GDYNReturnItemReturnShuttle">
+                <AISLE
+                    name="ReturnItemStationInvalid"
+                    letter="Invalid"
+                    laneaction="FailureConversionAisle">
+                </AISLE>
+                <ROAD
+                    name="UndoReturnItem"
+                    letter="Undo"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SuccessReturnItem"
+                    letter="Success"
+                    destination="CheckForCustomerRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="SuccessReturnItemExternalOrder"
+                    letter="Success"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="FailureReturnItem"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="FailureReturnItem"
+                    letter="Failure"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="CancelReturnItem"
+                    letter="Cancel"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="ReturnFindTransStation"
+                servicename="returns.returnfindtrans.returnfindtrans"
+                targettier="CURRENTTIER"
+                launchshuttle="ReturnFindTransLaunchShuttle"
+                returnshuttle="GDYNReturnFindTransReturnShuttle">
+                <ROAD
+                    name="UndoReturnTransaction"
+                    letter="Undo"
+                    destination="LastIndexed"
+                    tape="REWIND"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                 <ROAD
+                    name="RetryReturnTransaction"
+                    letter="Retry"
+                    destination="LastIndexed"
+                    tape="REWIND"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SuccessReturnTransaction"
+                    letter="Success"
+                    destination="CheckForCustomerRequired"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="SuccessReturnTransactionExternalOrder"
+                    letter="Success"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="ReturnTransactionNotFound"
+                    letter="TransactionNotFound"
+                    laneaction="TransactionNotFoundRoad"
+                    destination="ReturnItemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="ReturnItemReturnTransaction"
+                    letter="Continue"
+                    destination="ReturnItemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureReturnTransaction"
+                    letter="Failure"
+                    laneaction="TransactionNotFoundRoad"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <LIGHT  signal="IsExternalOrderReturnSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="FailureReturnTransactionExternalOrder"
+                    letter="Failure"
+                    laneaction="TransactionNotFoundRoad"
+                    destination="DisplayExternalOrderDialog"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <LIGHT  signal="IsExternalOrderReturnSignal"/>
+                </ROAD>
+                <ROAD
+                    name="CancelReturnTransaction"
+                    letter="Cancel"
+                    laneaction="TransactionNotFoundRoad"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="InvalidReturnTransaction"
+                    letter="Invalid"
+                    destination="DisplayReturnOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <COMMENT >
+                        An invalid transaction is attempted to be returned.
+                    </COMMENT>
+                </ROAD>
+                  <ROAD
+                    name="TooManyTransactionsToList"
+                    letter="TooManyTransactions"
+                    destination="DisplayTransactionSearchOptions"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                    <COMMENT >
+                        Too many transactions were found.  Return to the search options site.
+                    </COMMENT>
+                </ROAD>
+            </STATION>
+            <SYSTEMSITE  name="Final" action="RETURN"/>
+            <SYSTEMSITE  name="LastIndexed" action="BACKUP"/>
+            <SYSTEMSITE  name="NamedIndex" action="BACKUP"/>
+        </REGION>
+    </MAP>
+</SERVICE>

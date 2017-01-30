@@ -1,0 +1,1556 @@
+<?xml version="1.0"?>
+<!--
+/* ===========================================================================
+* Copyright (c) 2008, 2011, Oracle and/or its affiliates. All rights reserved. 
+ * ===========================================================================
+ * $Header: rgbustores/applications/pos/src/oracle/retail/stores/pos/services/customer/customeruicfg.xml /rgbustores_13.4x_generic_branch/4 2011/10/27 16:12:06 cgreene Exp $
+ * ===========================================================================
+ * NOTES
+ * <other useful comments, qualifications, etc.>
+ *
+ * MODIFIED    (MM/DD/YY)
+ *    cgreene   10/27/11 - implement popup dialog for customer info
+ *    cgreene   06/07/11 - update to first pass of removing pospal project
+ *    rrkohli   05/19/11 - names changed (pos ui quickwin)
+ *    rrkohli   05/05/11 - POS UI quickwin
+ *    cgreene   05/26/10 - convert to oracle packaging
+ *    blarsen   01/26/10 - e-mail not being valided when modifying an existing
+ *                         business customer. Making the optional fields in
+ *                         BUSINESS_CUSTOMER match those defined correctly in
+ *                         ADD_BUSINESS.
+ *    abondala  01/02/10 - Update Header date
+ *    cgreene   12/16/09 - add Keys button
+ *    ohorne    03/31/09 - added emailField to BusinessCustomerSpec's
+ *                         OptionalValidatingFields
+ *    ohorne    03/30/09 - removed spaces in CustomerAddSpec optional field
+ *                         names
+ *    sgu       03/11/09 - change text fields to alphanumerice field
+ *    mahising  02/27/09 - Resolve merge issue
+ *    mahising  02/27/09 - clean up code after code review by jack for PDO
+ *    kulu      02/24/09 - Forward Port - FUNCTION KEY FOR ADDCUSTOMER BUTTON
+ *                         IS WRONG WHEN SYSTEM IS OFFLINE
+ *    glwang    01/29/09 - disable multi-byte characters in login id field
+ *    glwang    01/29/09 - set max length of employee id field as 10
+ *    mahising  12/31/08 - fix QA issue
+ *    mahising  12/05/08 - base rework
+ *    aphulamb  11/27/08 - fixed merge issue
+ *    aphulamb  11/17/08 - Pickup Delivery order
+ *    mahising  11/25/08 - updated due to merge
+ *    ddbaker   11/11/08 - Updated to layouts to meet business requirements.
+ *    ddbaker   11/10/08 - Updated based on new requirements
+ *    ddbaker   11/06/08 - Update due to merges.
+ *
+ * ===========================================================================
+ */
+-->
+<!DOCTYPE UICFG SYSTEM "classpath://oracle/retail/stores/pos/config/defaults/posui.dtd">
+
+<UICFG>
+   <BEAN
+        specName="CustomerOptionsButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="NavigationButtonBean">
+
+        <BUTTON
+            actionName="Find"
+            enabled="true"
+            keyName="F2"
+            labelTag="Find"/>
+        <BUTTON
+            actionName="Add"
+            enabled="true"
+            keyName="F3"
+            labelTag="Add"/>
+        <BUTTON
+            actionName="AddBusiness"
+            enabled="true"
+            keyName="F4"
+            labelTag="AddBusiness"/>
+        <BUTTON
+            actionName="Delete"
+            enabled="true"
+            keyName="F5"
+            labelTag="Delete"/>
+    </BEAN>
+
+    <BEAN
+        specName="OfflineCustomerOptionsButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="NavigationButtonBean">
+
+        <BUTTON
+            actionName="Add"
+            enabled="true"
+            keyName="F2"
+            labelTag="Add"/>
+
+        <BUTTON
+            actionName="AddBusiness"
+            enabled="true"
+            keyName="F3"
+            labelTag="AddBusiness"/>
+    </BEAN>
+
+    <BEAN
+        specName="CustSearchOptButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="NavigationButtonBean">
+
+        <BUTTON
+            actionName="CustID"
+            enabled="true"
+            keyName="F2"
+            labelTag="CustID"/>
+        <BUTTON
+            actionName="EmpID"
+            enabled="true"
+            keyName="F3"
+            labelTag="EmployeeID"/>
+        <BUTTON
+            actionName="CustInfo"
+            enabled="true"
+            keyName="F4"
+            labelTag="CustomerInfo"/>
+        <BUTTON
+            actionName="BusinessInfo"
+            enabled="true"
+            keyName="F5"
+            labelTag="BusinessInfo"/>
+        <BUTTON
+            actionName="TaxID"
+            enabled="true"
+            keyName="F6"
+            labelTag="TaxID"/>
+    </BEAN>
+
+    <BEAN
+        specName="CustomerMasterSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="CustomerMasterBean">
+    </BEAN>
+
+    <BEAN
+        specName="CustomerButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="ValidateNavigationButtonBean">
+
+        <BUTTON
+            actionName="Details"
+            enabled="true"
+            keyName="F2"
+            labelTag="Details"/>
+        <BUTTON
+            actionName="Link"
+            enabled="true"
+            keyName="F3"
+            labelTag="Link"/>
+        <BUTTON
+            actionName="History"
+            enabled="true"
+            keyName="F4"
+            labelTag="History"/>
+        <BUTTON
+            actionName="Done"
+            enabled="true"
+            keyName="F5"
+            labelTag="Done"/>
+    </BEAN>
+
+   <BEAN
+        specName="CustomerContactButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="ValidateNavigationButtonBean">
+        <BUTTON
+            actionName="Link"
+            enabled="true"
+            keyName="F2"
+            labelTag="Link"/>
+        <BUTTON
+            actionName="History"
+            enabled="true"
+            keyName="F3"
+            labelTag="History"/>
+        <BUTTON
+            actionName="Done"
+            enabled="true"
+            keyName="F4"
+            labelTag="Done"/>
+    </BEAN>
+
+    <BEAN
+        specName="CustomerHistoryListSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="ListBean">
+
+            <BEANPROPERTY propName="focused" propValue="true"/>
+
+            <BEANPROPERTY propName="renderer"
+                      propValue="oracle.retail.stores.pos.ui.beans.CustomerHistoryListRenderer"/>
+
+            <BEANPROPERTY propName="labelTags" propValue="TransactionNumberLabel,DateLabel,LocationLabel,TypeLabel,TotalLabel"/>
+
+            <BEANPROPERTY propName="labelWeights" propValue="20,20,20,15,20"/>
+    </BEAN>
+
+    <BEAN
+        specName="CustomerHistoryDetailSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="CustomerHistoryDetailBean">
+
+            <BEANPROPERTY propName="focused" propValue="false"/>
+
+            <BEANPROPERTY propName="renderer"
+                      propValue="oracle.retail.stores.pos.ui.beans.SaleLineItemRenderer"/>
+
+            <BEANPROPERTY propName="labelTags"
+                      propValue="ItemLabel,QuantityLabel,PriceLabel,DiscountLabel,ExtendedPriceLabel"/>
+            <BEANPROPERTY propName="labelWeights"
+                      propValue="21,16,21,21,21"/>
+    </BEAN>
+
+    <BEAN
+        specName="CustomerHistoryDetailButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="NavigationButtonBean">
+
+        <BUTTON
+            actionName="Done"
+            enabled="true"
+            keyName="F2"
+            labelTag="Done"/>
+    </BEAN>
+
+	<!--  Begin GD-201 Customer Screen Required Field Changes -->
+    <!-- MSolis -->
+    <BEAN
+        specName="CustomerAddSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="com.gdyn.orpos.pos.ui.beans"
+        beanClassName="GDYNCustomerAddBean">
+    </BEAN>
+    
+	<BEAN
+        specName="CustomerInfoSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="com.gdyn.orpos.pos.ui.beans"
+        beanClassName="GDYNCustomerInfoBean">
+    </BEAN>        
+    <!--  End GD-201 Customer Screen Required Field Changes -->
+
+    <!-- GD-343: Modify customer search/add screens for customer capture fields -->
+    <!-- lcatania (Starmount) Apr 5, 2013 -->
+    <BEAN
+        specName="CustomerLookupSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="com.gdyn.orpos.pos.ui.beans"
+        beanClassName="GDYNCustomerInfoBean">
+            <BEANPROPERTY propName="CustomerLookup" propValue="true"/>
+    </BEAN>
+    <!-- End GD-343: Modify customer search/add screens for customer capture fields -->
+
+    <BEAN
+        specName="CustomerDeleteButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="NavigationButtonBean">
+
+        <BUTTON
+            actionName="Delete"
+            enabled="true"
+            keyName="F2"
+            labelTag="Delete"/>
+    </BEAN>
+    
+	<!-- Starts Modification by Vivek for Loyalty Enhancement. Creating new Email button at LocalNavigation -->    
+    <BEAN
+        specName="CustomerEmailButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="NavigationButtonBean">
+
+        <BUTTON
+            actionName="Email"
+            enabled="true"
+            keyName="F2"
+            labelTag="Email"/>
+            
+          <BUTTON
+            actionName="PhoneNo"
+            enabled="true"
+            keyName="F3"
+            labelTag="loyalityPhoneNo"/> 
+    </BEAN>
+    
+    <BEAN
+        specName="CaptureCustomerEmailSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="com.gdyn.orpos.pos.ui.beans"
+        beanClassName="GDYNEnterEmailBean">
+
+     	<FIELD fieldName="email"
+            fieldType="ConstrainedField"
+            labelTag="EmailLabel"
+            required="true"
+            enabled="true"
+            paramList="email,1,64"/>
+               
+    </BEAN>
+    
+    
+	<!-- End Modification by Vivek for Loyalty Enhancement. Creating new Email button at LocalNavigation -->
+  <BEAN
+        specName="CaptureCustomerPhoneNoSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="com.gdyn.orpos.pos.ui.beans"
+        beanClassName="GDYNEnterPhoneNoBean">
+
+    
+                  
+    </BEAN>
+    <BEAN
+        specName="CustomerSelectSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="DualListBean">
+
+            <!-- GD-343: Modify customer search/add screens for customer capture fields -->
+            <!-- lcatania (Starmount) Apr 3, 2013 -->
+            <BEANPROPERTY propName="topLabelTags" propValue="CustomerNameIDLabel,CustomerEmailLabel,TelephoneLabel"/>
+            <!-- End GD-343: Modify customer search/add screens for customer capture fields -->
+            <BEANPROPERTY propName="topLabelWeights" propValue="30,40,30"/>
+            <!-- GD-343: Modify customer search/add screens for customer capture fields -->
+            <!-- lcatania (Starmount) Apr 5, 2013 -->
+            <BEANPROPERTY propName="topRenderer"
+                      propValue="com.gdyn.orpos.pos.ui.beans.GDYNCustomerLineItemRenderer"/>
+
+            <BEANPROPERTY propName="renderer"
+                      propValue="com.gdyn.orpos.pos.ui.beans.GDYNCustomerLineItemRenderer"/>
+            <!-- End GD-343: Modify customer search/add screens for customer capture fields -->
+            <BEANPROPERTY propName="labelTags" propValue="PossibleMatchesLabel"/>
+            <BEANPROPERTY propName="labelWeights" propValue="100"/>
+            <BEANPROPERTY propName="focused" propValue="true"/>
+    </BEAN>
+
+    <BEAN
+        specName="CustomerSelectButtonSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="NavigationButtonBean">
+
+        <BUTTON
+            actionName="Continue"
+            enabled="true"
+            keyName="F2"
+            labelTag="Continue"/>
+    </BEAN>
+
+    <BEAN
+        specName="BusinessCustomerSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="CustomerInfoBean">
+            <BEANPROPERTY propName="BusinessCustomer" propValue="true"/>
+    </BEAN>
+
+    <BEAN
+        specName="BusCustomerSearchSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="oracle.retail.stores.pos.ui.beans"
+        beanClassName="CustomerInfoBean">
+            <BEANPROPERTY propName="CustomerLookup" propValue="true"/>
+            <BEANPROPERTY propName="BusinessCustomer" propValue="true"/>
+    </BEAN>
+    
+    <!-- GD-343: Modify customer search/add screens for customer capture fields -->
+    <!-- lcatania (Starmount) Apr 4, 2013 -->
+    <BEAN
+        specName="CustomerInfoGlobalNavigationPanelSpec"
+        configuratorPackage="oracle.retail.stores.pos.ui"
+        configuratorClassName="POSBeanConfigurator"
+        beanPackage="com.gdyn.orpos.pos.ui.beans"
+        beanClassName="GDYNCustomerInfoGlobalButtonBean"
+        cachingScheme="ONE">
+
+        <BUTTON
+            actionName="Help"
+            keyName="F1"
+            enabled="true"
+            labelTag="Help"
+            actionListenerName="oracle.retail.stores.pos.ui.behavior.HelpAction"/>
+
+        <BUTTON
+            actionName="Clear"
+            keyName="F11"
+            enabled="true"
+            labelTag="Delete"/>
+
+        <BUTTON
+            actionName="Cancel"
+            keyName="F12"
+            enabled="true"
+            labelTag="Cancel"
+            actionListenerName="oracle.retail.stores.pos.ui.behavior.ConfirmCancelAction"/>
+
+        <BUTTON
+            actionName="Undo"
+            keyName="Esc"
+            enabled="true"
+            labelTag="Undo"/>
+
+        <BUTTON
+            actionName="Next"
+            keyName="Enter"
+            enabled="false"
+            labelTag="Next"/>
+
+        <BUTTON
+            actionName="Keys"
+            keyName="Ctrl+K"
+            enabled="true"
+            labelTag="Keys"
+            label="Keys"
+            parameterName="OnScreenKeyboardEnabled"
+            actionListenerName="oracle.retail.stores.pos.ui.behavior.KeyDialogAction"/>
+    </BEAN>
+    <!-- End GD-343: Modify customer search/add screens for customer capture fields -->
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_OPTIONS"
+        defaultScreenSpecName="ResponseEntryScreenSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerOptionsScreenName"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag"
+                    propValue="CustomerOptionsPromptText"/>
+            <BEANPROPERTY
+                    propName="responseField"
+                    propValue="oracle.retail.stores.pos.ui.beans.AlphaNumericTextField"/>
+            <BEANPROPERTY propName="maxLength" propValue="14"/>
+            <BEANPROPERTY propName="doubleByteCharsAllowed" propValue="false"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerOptionsButtonSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                propName="buttonStates"
+                propValue="Help[true],Cancel[false],Undo[true],Clear[false],Next[false],Keys[true]"/>
+        </ASSIGNMENT>
+
+        <DEVICECONNECTION
+                deviceSessionName="MSRSession"
+                targetBeanSpecName="PromptAndResponsePanelSpec"
+                listenerPackage="java.beans"
+                listenerInterfaceName="PropertyChangeListener"
+                adapterPackage="oracle.retail.stores.foundation.manager.gui"
+                adapterClassName="InputDataAdapter"
+                adapterParameter="setMSRData"
+                activateMode="MODE_DECODESCAN"/>
+
+        <DEVICECONNECTION
+                deviceSessionName="ScannerSession"
+                targetBeanSpecName="PromptAndResponsePanelSpec"
+                listenerPackage="java.beans"
+                listenerInterfaceName="PropertyChangeListener"
+                adapterPackage="oracle.retail.stores.foundation.manager.gui"
+                adapterClassName="InputDataAdapter"
+                adapterParameter="setScannerData"
+                activateMode="MODE_SINGLESCAN"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="OFFLINE_CUSTOMER_OPTIONS"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="OfflineCustomerOptionsScreenName"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag"
+                    propValue="OfflineCustomerOptionsPromptText"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="OfflineCustomerOptionsButtonSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                propName="buttonStates"
+                propValue="Help[true],Cancel[false],Undo[true],Clear[false],Next[false],Keys[true]"/>
+        </ASSIGNMENT>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_SEARCH_OPTIONS"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerSearchOptionScreenName"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerSearchOptionPromptText"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustSearchOptButtonSpec">
+        </ASSIGNMENT>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="HISTORY_LIST"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        modelPackage="oracle.retail.stores.pos.ui.beans"
+        modelClassName="ListBeanModel"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerHistoryListScreenName"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerHistoryListPromptText"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerHistoryListSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                    propName="manageNextButton"
+                    propValue="false"/>
+            <BEANPROPERTY
+                propName="buttonStates"
+                propValue="Help[true],Cancel[true],Undo[true],Clear[false],Next[true],Keys[true]"/>
+        </ASSIGNMENT>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="HISTORY_DETAIL"
+        defaultScreenSpecName="POSStackedStatusScreenSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StackedStatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="HistoryDetailScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="TotalStatusPanel"
+                beanSpecName="StackedTotalPanelSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="HistoryDetailPromptText"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerHistoryDetailSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerHistoryDetailButtonSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                  areaName="GlobalNavigationPanel"
+                  beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                     propName="buttonStates"
+                     propValue="Help[true],Cancel[true],Undo[true],Clear[false],Next[false],Keys[true]"/>
+        </ASSIGNMENT>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_FIND_ID"
+        defaultScreenSpecName="ResponseEntryScreenSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerFindIDScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerFindIDPromptText"/>
+            <BEANPROPERTY
+                    propName="responseField" propValue="oracle.retail.stores.pos.ui.beans.AlphaNumericTextField"/>
+            <BEANPROPERTY propName="maxLength" propValue="14"/>
+            <BEANPROPERTY propName="doubleByteCharsAllowed" propValue="false"/>
+        </ASSIGNMENT>
+
+        <DEVICECONNECTION
+                deviceSessionName="ScannerSession"
+                targetBeanSpecName="PromptAndResponsePanelSpec"
+                listenerPackage="java.beans"
+                listenerInterfaceName="PropertyChangeListener"
+                adapterPackage="oracle.retail.stores.foundation.manager.gui"
+                adapterClassName="InputDataAdapter"
+                adapterParameter="setScannerData"
+                activateMode="MODE_SINGLESCAN"/>
+        <DEVICECONNECTION
+                deviceSessionName="MSRSession"
+                targetBeanSpecName="PromptAndResponsePanelSpec"
+                listenerPackage="java.beans"
+                listenerInterfaceName="PropertyChangeListener"
+                adapterPackage="oracle.retail.stores.foundation.manager.gui"
+                adapterClassName="InputDataAdapter"
+                adapterParameter="setMSRData"
+                activateMode="MODE_DECODESCAN"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_DETAILS"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerMasterSpec">
+            <BEANPROPERTY
+                    propName="OptionalValidatingFields"
+                    propValue="BirthdateField,BirthYearField,EmployeeIDField,fullNameField"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerMasterScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag"
+                    propValue="CustomerMasterPromptText"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                    propName="manageNextButton"
+                    propValue="false"/>
+            <BEANPROPERTY
+                    propName="buttonStates"
+                    propValue="Help[true],Cancel[true],Undo[true],Clear[true],Next[true],Keys[true]"/>
+        </ASSIGNMENT>
+
+            <CONNECTION
+                listenerInterfaceName="ClearActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="GlobalNavigationPanelSpec"
+                targetBeanSpecName="CustomerMasterSpec"/>
+            <CONNECTION
+                listenerInterfaceName="ValidateActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="GlobalNavigationPanelSpec"
+                targetBeanSpecName="CustomerMasterSpec"/>
+            <CONNECTION
+                sourceBeanSpecName="CustomerMasterSpec"
+                targetBeanSpecName="GlobalNavigationPanelSpec"
+                listenerPackage="javax.swing.event"
+                listenerInterfaceName="DocumentListener"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="ADD_CUSTOMER"
+        defaultScreenSpecName="DefaultValidatingSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+            areaName="GlobalNavigationPanel"
+            beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                propName="manageNextButton"
+                propValue="false"/>
+            <BEANPROPERTY
+                propName="buttonStates"
+                propValue="Help[true],Cancel[true],Undo[true],Clear[true],Next[false],Keys[true]"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+            areaName="WorkPanel"
+            beanSpecName="CustomerAddSpec">
+            <BEANPROPERTY
+                propName="OptionalValidatingFields"
+                propValue="customerIDField,employeeIDField,addressLine2Field,addressLine3Field,extPostalCodeField,emailField,pricingGroupField"/>
+            <BEANPROPERTY
+                propName="RequiredValidatingFields"
+                propValue="firstNameField,lastNameField,addressLine1Field,cityField,stateField,postalCodeField,telephoneField,phoneTypeField,custTaxIDField"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerButtonSpec">
+            <BEANPROPERTY
+                propName="actionName"
+                propValue="Done,Link,Details"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+            areaName="StatusPanel"
+            beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                propName="screenNameTag" propValue="CustomerAddScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+            areaName="PromptAndResponsePanel"
+            beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                propName="promptTextTag"
+                propValue="CustomerAddPromptText"/>
+        </ASSIGNMENT>
+
+        <CONNECTION
+             listenerInterfaceName="ValidateActionListener"
+             listenerPackage="oracle.retail.stores.pos.ui.behavior"
+             sourceBeanSpecName="CustomerButtonSpec"
+             targetBeanSpecName="CustomerAddSpec"/>
+        <CONNECTION
+            listenerInterfaceName="ClearActionListener"
+            listenerPackage="oracle.retail.stores.pos.ui.behavior"
+            sourceBeanSpecName="GlobalNavigationPanelSpec"
+            targetBeanSpecName="CustomerAddSpec"/>
+        <CONNECTION
+            sourceBeanSpecName="CustomerAddSpec"
+            targetBeanSpecName="GlobalNavigationPanelSpec"
+            listenerPackage="javax.swing.event"
+            listenerInterfaceName="DocumentListener"/>
+    </OVERLAYSCREEN>
+
+    <!-- A hidden StatusPanel area is added to allow CUSTOMER_INFO_DIALOG to include 
+    the StatusBean. The area is set to a JLabel which doesn’t support children 
+    so no bean will actually appear in this area. -->
+    <OVERLAYSCREEN
+        specName="CUSTOMER_INFO_DIALOG"
+        resourceBundleFilename="managerText"
+        modelPackage="oracle.retail.stores.pos.ui.beans"
+        modelClassName="CustomerInfoBeanModel"
+        defaultScreenSpecName="DefaultDialogSpec" >
+        <ASSIGNMENT
+            areaName="DialogPromptAndResponsePanel"
+            beanSpecName="CustomerInfoSpec" />
+        <ASSIGNMENT
+            areaName="DialogButtonsPanel"
+            beanSpecName="DialogOneButtonSpec"/>
+        <ASSIGNMENT
+            areaName="StatusPanel"
+            beanSpecName="StatusPanelSpec"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_INFO"
+        defaultScreenSpecName="DefaultValidatingSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerInfoSpec">
+            <BEANPROPERTY
+                propName="OptionalValidatingFields"
+                propValue="customerIDField,employeeIDField,addressLine2Field,addressLine3Field,extPostalCodeField,emailField,pricingGroupField"/>
+            <BEANPROPERTY
+                propName="RequiredValidatingFields"
+                propValue="firstNameField,lastNameField,addressLine1Field,cityField,stateField,postalCodeField,telephoneField,phoneTypeField,custTaxIDField"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerContactScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerContactPromptText"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerButtonSpec">
+            <BEANPROPERTY
+                propName="actionName"
+                propValue="Done,Link,Details,History"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                        propName="manageNextButton"
+                        propValue="false"/>
+            <BEANPROPERTY
+                        propName="buttonStates"
+                        propValue="Help[true],Cancel[true],Undo[true],Clear[true],Next[false],Keys[true]"/>
+        </ASSIGNMENT>
+
+            <CONNECTION
+               listenerInterfaceName="ClearActionListener"
+               listenerPackage="oracle.retail.stores.pos.ui.behavior"
+               sourceBeanSpecName="GlobalNavigationPanelSpec"
+               targetBeanSpecName="CustomerInfoSpec"/>
+            <CONNECTION
+               sourceBeanSpecName="CustomerInfoSpec"
+               targetBeanSpecName="GlobalNavigationPanelSpec"
+               listenerPackage="javax.swing.event"
+               listenerInterfaceName="DocumentListener"/>
+           <CONNECTION
+               listenerInterfaceName="ValidateActionListener"
+               listenerPackage="oracle.retail.stores.pos.ui.behavior"
+               sourceBeanSpecName="CustomerButtonSpec"
+               targetBeanSpecName="CustomerInfoSpec"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="FIND_CUSTOMER_EMPLOYEE_ID"
+        defaultScreenSpecName="ResponseEntryScreenSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerFindByEmployeeIDScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerFindByEmployeeIDPromptText"/>
+            <BEANPROPERTY
+                    propName="responseField" propValue="oracle.retail.stores.pos.ui.beans.AlphaNumericTextField"/>
+            <BEANPROPERTY propName="maxLength" propValue="10"/>
+            <BEANPROPERTY propName="doubleByteCharsAllowed" propValue="false"/>
+        </ASSIGNMENT>
+
+        <DEVICECONNECTION
+                deviceSessionName="ScannerSession"
+                targetBeanSpecName="PromptAndResponsePanelSpec"
+                listenerPackage="java.beans"
+                listenerInterfaceName="PropertyChangeListener"
+                adapterPackage="oracle.retail.stores.foundation.manager.gui"
+                adapterClassName="InputDataAdapter"
+                adapterParameter="setScannerData"
+                activateMode="MODE_SINGLESCAN"/>
+        <DEVICECONNECTION
+                deviceSessionName="MSRSession"
+                targetBeanSpecName="PromptAndResponsePanelSpec"
+                listenerPackage="java.beans"
+                listenerInterfaceName="PropertyChangeListener"
+                adapterPackage="oracle.retail.stores.foundation.manager.gui"
+                adapterClassName="InputDataAdapter"
+                adapterParameter="setMSRData"
+                activateMode="MODE_DECODESCAN"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="FIND_CUSTOMER_INFO"
+        defaultScreenSpecName="DefaultValidatingSpec"
+        resourceBundleFilename="customerText">
+
+        <!-- GD-343: Modify customer search/add screens for customer capture fields -->
+        <!-- lcatania (Starmount) Apr 5, 2013 -->
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerLookupSpec">
+            <BEANPROPERTY
+                    propName="OptionalValidatingFields" propValue="emailField"/>
+        </ASSIGNMENT>
+        <!-- End GD-343: Modify customer search/add screens for customer capture fields -->
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerFindInfoScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerFindInfoPromptText"/>
+        </ASSIGNMENT>
+        <!-- GD-343: Modify customer search/add screens for customer capture fields -->
+        <!-- lcatania (Starmount) Apr 5, 2013 -->
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="CustomerInfoGlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                    propName="manageNextButton"
+                    propValue="false"/>                
+        </ASSIGNMENT>
+        
+        
+            <CONNECTION
+                listenerInterfaceName="ClearActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="CustomerInfoGlobalNavigationPanelSpec"
+                targetBeanSpecName="CustomerLookupSpec"/>
+            <CONNECTION
+                listenerInterfaceName="ValidateActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="CustomerInfoGlobalNavigationPanelSpec"
+                targetBeanSpecName="CustomerLookupSpec"/>
+            <CONNECTION
+                sourceBeanSpecName="CustomerLookupSpec"
+                targetBeanSpecName="CustomerInfoGlobalNavigationPanelSpec"
+                listenerPackage="javax.swing.event"
+                listenerInterfaceName="DocumentListener"/>
+            <CONNECTION 
+                sourceBeanSpecName="CustomerLookupSpec"
+                targetBeanSpecName="CustomerInfoGlobalNavigationPanelSpec"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                listenerInterfaceName="GlobalButtonListener"/>
+        <!-- End GD-343: Modify customer search/add screens for customer capture fields -->
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_DELETE"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerInfoSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                        propName="screenNameTag" propValue="CustomerDeleteScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                        propName="promptTextTag" propValue="CustomerDeletePromptText"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerDeleteButtonSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                        propName="manageNextButton"
+                        propValue="false"/>
+            <BEANPROPERTY
+                        propName="buttonStates"
+                        propValue="Help[true],Cancel[true],Undo[true],Clear[true],Next[true],Keys[true]"/>
+        </ASSIGNMENT>
+
+           <CONNECTION
+                   listenerInterfaceName="ClearActionListener"
+                   listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                   sourceBeanSpecName="GlobalNavigationPanelSpec"
+                   targetBeanSpecName="CustomerInfoSpec"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="ADD_BUSINESS"
+        defaultScreenSpecName="DefaultValidatingSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag"
+                    propValue="CustomerAddPromptText"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="BusinessCustomerSpec">
+            <BEANPROPERTY
+                    propName="OptionalValidatingFields" propValue="customerIDField,addressLine2Field,extPostalCodeField,taxCertificateField,reasonCodeField,pricingGroupField,custTaxIDField,emailField"/>
+            <BEANPROPERTY
+                    propName="RequiredValidatingFields" propValue="customerNameField,addressLine1Field,cityField,stateField,postalCodeField,countryField,telephoneField"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerAddScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerContactButtonSpec">
+            <BEANPROPERTY
+                propName="actionName"
+                propValue="Done,Link,History"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                    propName="manageNextButton"
+                    propValue="false"/>
+            <BEANPROPERTY
+                    propName="buttonStates"
+                    propValue="Help[true],Cancel[true],Undo[true],Clear[true],Next[false],Keys[true]"/>
+        </ASSIGNMENT>
+
+            <CONNECTION
+                listenerInterfaceName="ClearActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="GlobalNavigationPanelSpec"
+                targetBeanSpecName="BusinessCustomerSpec"/>
+
+            <CONNECTION
+                listenerPackage="javax.swing.event"
+                listenerInterfaceName="DocumentListener"
+                sourceBeanSpecName="BusinessCustomerSpec"
+                targetBeanSpecName="GlobalNavigationPanelSpec"/>
+
+            <CONNECTION
+                listenerInterfaceName="ValidateActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="CustomerContactButtonSpec"
+                targetBeanSpecName="BusinessCustomerSpec"/>
+    </OVERLAYSCREEN>
+
+	<!-- Starts Modification by Vivek for Loyalty Enhancement. Creating new Overlay for Loyalty Prompt -->
+	<OVERLAYSCREEN
+        defaultScreenSpecName="ResponseEntryScreenSpec"
+        resourceBundleFilename="customerText"
+        specName="ENTER_LOYALTY_ID">
+
+        <ASSIGNMENT
+            areaName="GlobalNavigationPanel"
+            beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+              propName="manageNextButton" propValue="false"/>
+            <BEANPROPERTY
+                propName="buttonStates" propValue="Help[true],Cancel[false],Undo[false],Next[true],Keys[false]"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+            areaName="StatusPanel"
+            beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                propName="screenNameTag" propValue="CaptureCustomerLoyaltyScreen"/>
+        </ASSIGNMENT>
+
+		<ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerEmailButtonSpec">
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+            areaName="PromptAndResponsePanel"
+            beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                propName="promptTextTag" propValue="CaptureCustomerLoyaltyPrompt"/>
+            <BEANPROPERTY
+                propName="responseField" propValue="oracle.retail.stores.pos.ui.beans.NumericTextField"/>
+            <BEANPROPERTY propName="maxLength" propValue="10"/>
+            <BEANPROPERTY propName="minLength" propValue="1"/>
+        </ASSIGNMENT>
+
+    </OVERLAYSCREEN>
+    
+    <!-- changed by vivek to add loyalty screen for original loyalty id and disabling the Email button -->
+    <OVERLAYSCREEN
+        defaultScreenSpecName="ResponseEntryScreenSpec"
+        resourceBundleFilename="customerText"
+        specName="ENTER_ORIGINAL_LOYALTY_ID">
+
+        <ASSIGNMENT
+            areaName="GlobalNavigationPanel"
+            beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+              propName="manageNextButton" propValue="false"/>
+            <BEANPROPERTY
+                propName="buttonStates" propValue="Help[true],Cancel[false],Undo[false],Next[true],Keys[false]"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+            areaName="StatusPanel"
+            beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                propName="screenNameTag" propValue="CaptureCustomerLoyaltyScreen"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+            areaName="PromptAndResponsePanel"
+            beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                propName="promptTextTag" propValue="CaptureCustomerOriginalLoyaltyPrompt"/>
+            <BEANPROPERTY
+                propName="responseField" propValue="oracle.retail.stores.pos.ui.beans.NumericTextField"/>
+            <BEANPROPERTY propName="maxLength" propValue="10"/>
+            <BEANPROPERTY propName="minLength" propValue="1"/>
+        </ASSIGNMENT>
+
+    </OVERLAYSCREEN>
+    
+    <OVERLAYSCREEN
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText"
+        specName="ENTER_EMAIL_ID">
+
+        <ASSIGNMENT
+            areaName="GlobalNavigationPanel"
+            beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+              propName="manageNextButton" propValue="false"/>
+            <BEANPROPERTY
+                propName="buttonStates" propValue="Help[true],Cancel[false],Undo[true],Next[true],Keys[false]"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+            areaName="StatusPanel"
+            beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                propName="screenNameTag" propValue="CaptureCustomerEmailScreen"/>
+        </ASSIGNMENT>
+
+		<ASSIGNMENT
+            areaName="WorkPanel"
+            beanSpecName="CaptureCustomerEmailSpec">
+            <BEANPROPERTY
+                propName="RequiredValidatingFields" propValue="email"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+            areaName="PromptAndResponsePanel"
+            beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                propName="promptTextTag" propValue="CaptureCustomerEmailPrompt"/>
+            <BEANPROPERTY propName="enterData" propValue="false"/>
+        </ASSIGNMENT>
+        
+        <CONNECTION
+            sourceBeanSpecName="GlobalNavigationPanelSpec"
+            targetBeanSpecName="CaptureCustomerEmailSpec"
+            listenerPackage="oracle.retail.stores.pos.ui.behavior"
+            listenerInterfaceName="ValidateActionListener"/>  
+
+    </OVERLAYSCREEN>
+	<!-- End Modification by Vivek for Loyalty Enhancement. Creating new Overlay for Loyalty Prompt -->
+ <!-- changed by Dharmendra  -->
+   <OVERLAYSCREEN
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText"
+        modelPackage="oracle.retail.stores.pos.ui.beans"
+        modelClassName="GDYNPhoneNoBeanModel"
+        specName="ENTER_PHONE_NO">
+
+        <ASSIGNMENT
+            areaName="GlobalNavigationPanel"
+            beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+              propName="manageNextButton" propValue="false"/>
+            <BEANPROPERTY
+                propName="buttonStates" propValue="Help[true],Cancel[false],Undo[true],Next[true],Keys[false]"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+            areaName="StatusPanel"
+            beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                propName="screenNameTag" propValue="CaptureCustomerPhoneNoScreen"/>
+        </ASSIGNMENT>
+
+		<ASSIGNMENT
+            areaName="WorkPanel"
+            beanSpecName="CaptureCustomerPhoneNoSpec">
+            <BEANPROPERTY
+                propName="RequiredValidatingFields" propValue="phoneNo"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+            areaName="PromptAndResponsePanel"
+            beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                propName="promptTextTag" propValue="CaptureCustomerPhoneNoPrompt"/>
+            <BEANPROPERTY propName="enterData" propValue="false"/>
+        </ASSIGNMENT>
+        
+        <CONNECTION
+            sourceBeanSpecName="GlobalNavigationPanelSpec"
+            targetBeanSpecName="CaptureCustomerPhoneNoSpec"
+            listenerPackage="oracle.retail.stores.pos.ui.behavior"
+            listenerInterfaceName="ValidateActionListener"/>  
+
+    </OVERLAYSCREEN>
+<!-- End Modification by Dharmendra  -->
+
+    <OVERLAYSCREEN
+        specName="BUSINESS_CUSTOMER"
+        defaultScreenSpecName="DefaultValidatingSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag"
+                    propValue="CustomerContactPromptText"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="BusinessCustomerSpec">
+            <BEANPROPERTY
+                    propName="OptionalValidatingFields" propValue="customerIDField,addressLine2Field,extPostalCodeField,taxCertificateField,reasonCodeField,pricingGroupField,custTaxIDField,emailField"/>
+            <BEANPROPERTY
+                    propName="RequiredValidatingFields" propValue="customerNameField,addressLine1Field,cityField,stateField,postalCodeField,countryField,telephoneField"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerContactScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerContactButtonSpec">
+            <BEANPROPERTY
+                propName="actionName"
+                propValue="Done,Link,History"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                    propName="manageNextButton"
+                    propValue="false"/>
+            <BEANPROPERTY
+                    propName="buttonStates"
+                    propValue="Help[true],Cancel[true],Undo[true],Clear[true],Next[false],Keys[true]"/>
+        </ASSIGNMENT>
+
+            <CONNECTION
+                listenerInterfaceName="ClearActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="GlobalNavigationPanelSpec"
+                targetBeanSpecName="BusinessCustomerSpec"/>
+            <CONNECTION
+                listenerPackage="javax.swing.event"
+                listenerInterfaceName="DocumentListener"
+                sourceBeanSpecName="BusinessCustomerSpec"
+                targetBeanSpecName="GlobalNavigationPanelSpec"/>
+            <CONNECTION
+                listenerInterfaceName="ValidateActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="CustomerContactButtonSpec"
+                targetBeanSpecName="BusinessCustomerSpec"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="BUSINESS_SEARCH"
+        defaultScreenSpecName="DefaultValidatingSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag"
+                    propValue="BusinessSearchPromptText"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="BusCustomerSearchSpec">
+            <BEANPROPERTY
+                    propName="OptionalValidatingFields" propValue="addressLine1Field,telephoneField"/>
+            <BEANPROPERTY
+                    propName="RequiredValidatingFields" propValue="customerNameField,postalCodeField"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="BusinessSearchScreenName"/>
+        </ASSIGNMENT>
+
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                    propName="manageNextButton"
+                    propValue="false"/>
+            <BEANPROPERTY
+                    propName="buttonStates"
+                    propValue="Help[true],Cancel[true],Undo[true],Clear[true],Next[true],Keys[true]"/>
+        </ASSIGNMENT>
+
+            <CONNECTION
+                listenerInterfaceName="ClearActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="GlobalNavigationPanelSpec"
+                targetBeanSpecName="BusCustomerSearchSpec"/>
+            <CONNECTION
+                listenerPackage="javax.swing.event"
+                listenerInterfaceName="DocumentListener"
+                sourceBeanSpecName="BusCustomerSearchSpec"
+                targetBeanSpecName="GlobalNavigationPanelSpec"/>
+            <CONNECTION
+                listenerInterfaceName="ValidateActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="GlobalNavigationPanelSpec"
+                targetBeanSpecName="BusCustomerSearchSpec"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="DELETE_BUSINESS"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag"
+                    propValue="BusinessCustomerDeletePromptText"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="BusinessCustomerSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="BusinessCustomerDeleteScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerDeleteButtonSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                    propName="manageNextButton"
+                    propValue="false"/>
+            <BEANPROPERTY
+                    propName="buttonStates"
+                    propValue="Help[true],Cancel[true],Undo[true],Clear[true],Next[false],Keys[true]"/>
+        </ASSIGNMENT>
+
+            <CONNECTION
+                listenerInterfaceName="ClearActionListener"
+                listenerPackage="oracle.retail.stores.pos.ui.behavior"
+                sourceBeanSpecName="GlobalNavigationPanelSpec"
+                targetBeanSpecName="BusinessCustomerSpec"/>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_SELECT_DELETE"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerSelectSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerSelectDeleteScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerSelectDeletePrompt"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+            areaName="GlobalNavigationPanel"
+            beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                propName="manageNextButton"
+                propValue="false"/>
+            <BEANPROPERTY
+                propName="buttonStates"
+                propValue="Help[true],Cancel[true],Undo[true],Clear[false],Next[true],Keys[true]"/>
+        </ASSIGNMENT>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_SELECT_MODIFY"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerSelectSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerSelectModifyScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerSelectModifyPrompt"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                   propName="manageNextButton"
+                   propValue="false"/>
+            <BEANPROPERTY
+                   propName="buttonStates"
+                   propValue="Help[true],Cancel[true],Undo[true],Clear[false],Next[true],Keys[true]"/>
+        </ASSIGNMENT>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="CUSTOMER_SELECT_ADD"
+        defaultScreenSpecName="EYSPOSDefaultSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="WorkPanel"
+                beanSpecName="CustomerSelectSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                    propName="screenNameTag" propValue="CustomerSelectAddScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                    propName="promptTextTag" propValue="CustomerSelectAddPrompt"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="LocalNavigationPanel"
+                beanSpecName="CustomerSelectButtonSpec">
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="GlobalNavigationPanel"
+                beanSpecName="GlobalNavigationPanelSpec">
+            <BEANPROPERTY
+                  propName="manageNextButton"
+                  propValue="false"/>
+            <BEANPROPERTY
+                  propName="buttonStates"
+                  propValue="Help[true],Cancel[true],Undo[true],Clear[false],Next[true],Keys[true]"/>
+        </ASSIGNMENT>
+    </OVERLAYSCREEN>
+
+    <OVERLAYSCREEN
+        specName="FIND_CUSTOMER_BY_TAX_ID"
+        defaultScreenSpecName="ResponseEntryScreenSpec"
+        resourceBundleFilename="customerText">
+
+        <ASSIGNMENT
+                areaName="StatusPanel"
+                beanSpecName="StatusPanelSpec">
+            <BEANPROPERTY
+                        propName="screenNameTag" propValue="CustomerFindTaxIDScreenName"/>
+        </ASSIGNMENT>
+        <ASSIGNMENT
+                areaName="PromptAndResponsePanel"
+                beanSpecName="PromptAndResponsePanelSpec">
+            <BEANPROPERTY
+                        propName="promptTextTag" propValue="CustomerFindTaxIDPromptText"/>
+            <BEANPROPERTY
+                        propName="responseField" propValue="oracle.retail.stores.pos.ui.beans.AlphaNumericTextField"/>
+            <BEANPROPERTY propName="maxLength" propValue="15"/>
+        </ASSIGNMENT>
+
+        <DEVICECONNECTION
+                deviceSessionName="ScannerSession"
+                targetBeanSpecName="PromptAndResponsePanelSpec"
+                listenerPackage="java.beans"
+                listenerInterfaceName="PropertyChangeListener"
+                adapterPackage="oracle.retail.stores.foundation.manager.gui"
+                adapterClassName="InputDataAdapter"
+                adapterParameter="setScannerData"
+                activateMode="MODE_SINGLESCAN"/>
+        <DEVICECONNECTION
+                deviceSessionName="MSRSession"
+                targetBeanSpecName="PromptAndResponsePanelSpec"
+                listenerPackage="java.beans"
+                listenerInterfaceName="PropertyChangeListener"
+                adapterPackage="oracle.retail.stores.foundation.manager.gui"
+                adapterClassName="InputDataAdapter"
+                adapterParameter="setMSRData"
+                activateMode="MODE_DECODESCAN"/>
+    </OVERLAYSCREEN>
+</UICFG>

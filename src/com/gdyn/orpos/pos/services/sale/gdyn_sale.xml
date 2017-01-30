@@ -1,0 +1,3240 @@
+<?xml version='1.0' ?>
+<!--
+/* ===========================================================================
+ * Copyright (c) Starmount, 2012 and GD, 2012.
+ * ===========================================================================
+ *
+ * GD-116 - Created to print employee name and a line for cashier signature
+ * lcatania
+ */
+-->
+<!DOCTYPE SERVICE SYSTEM "classpath://oracle/retail/stores/foundation/tour/dtd/tourguide.dtd">
+
+<SERVICE
+    name="Sale"
+    package="oracle.retail.stores.pos.services.sale"
+    tourcam="ON">
+    <COMMENT >
+        Point-Of-Sale is the implementation of the Sale
+        Package Requirements.
+    </COMMENT>
+    <!-- Begin GD-384: Only applies employee discount to items posted to sell item screen -->
+    <!-- at time employee discount applied - not to items added afterwards -->
+    <!-- lcatania (Starmount) Apr 26, 2013 -->
+    <CARGO  class="GDYNSaleCargo" package="com.gdyn.orpos.pos.services.sale"/>
+    <!-- End GD-384: Only applies employee discount to items posted to sell item screen -->
+    <SERVICECODE >
+        <LANEACTION class="CancelLetterAisle" package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="CancelSelectedAisle"/>
+        <LANEACTION class="CheckIfSizeRequiredAisle" package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="DeleteItemRoad"/>
+        <LANEACTION class="DisplayItemErrorAisle"/>
+        <LANEACTION class="DisplayItemSizeDialogAisle" package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="HideOnScreenKeyboardAisle" package="oracle.retail.stores.pos.services.common"/>
+        <!-- Begin GD-384: Only applies employee discount to items posted to sell item screen -->
+        <!-- at time employee discount applied - not to items added afterwards -->
+        <!-- lcatania (Starmount) Apr 26, 2013 -->
+        <LANEACTION class="GDYNItemAddedRoad" package="com.gdyn.orpos.pos.services.sale"/>
+        <!-- End GD-384: Only applies employee discount to items posted to sell item screen -->
+        <LANEACTION class="ItemInfoEnteredAisle" package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="ItemNumberEnteredAisle"/>
+        <LANEACTION class="ModifyItemSelectedRoad"/>
+        <LANEACTION class="MultipleQuantitySerialItemsNotAllowedAisle" package="oracle.retail.stores.pos.services.modifyitem.serialnumber"/>
+         <!-- new aisles added by Dharmendra to fix POS-334 -->
+        <LANEACTION class="GDYNMultipleCouponsNotAllowedAisle" package="com.gdyn.orpos.pos.services.sale"/>
+        <LANEACTION class="GDYNNoEligibleItemForCpnAisle" package="com.gdyn.orpos.pos.services.sale"/>
+         <LANEACTION class="GDYNCouponAlreadyExistsAisle" package="com.gdyn.orpos.pos.services.sale"/>
+         <!--End modifications added by Dharmendra to fix POS-334 -->
+        <LANEACTION class="RemoveItemRoad"/>
+        <LANEACTION class="ResetItemSelectedRoad"/>
+        <LANEACTION class="ValidateItemSizeAisle" package="oracle.retail.stores.pos.services.common"/>
+        
+        <!-- modified by Vivek for adding new Road for Loyalty enhancement -->
+        <LANEACTION class="GDYNLoyaltyIdEnteredRoad"  package="com.gdyn.orpos.pos.services.sale"/>
+        <LANEACTION class="ContinueConversionAisle"  package="oracle.retail.stores.pos.services.common"/>
+        <LANEACTION class="GDYNEmailIdEnteredRoad"  package="com.gdyn.orpos.pos.services.sale"/>
+          <LANEACTION class="GDYNContinueConversionAisle"  package="com.gdyn.orpos.pos.services.sale"/>
+          
+          
+        <LANEACTION class="GDYNPhoneNoEnteredRoad"  package="com.gdyn.orpos.pos.services.sale"/>
+        
+        
+        
+        <LETTER name="ActivationCancelled"/>
+        <LETTER name="Add"/>
+        <LETTER name="Cancel"/>
+        <LETTER name="ChangeShippingMethod"/>
+        <LETTER name="Clear"/>
+        <LETTER name="Continue"/>
+        <LETTER name="Continue2"/>
+        <LETTER name="Customer"/>
+        <LETTER name="Delete"/>
+        <LETTER name="Done"/>
+        <LETTER name="Error"/>
+        <LETTER name="Exit"/>
+        <LETTER name="ExitCompleteSale"/>
+        <LETTER name="ExitLayaway"/>
+        <LETTER name="ExitPayment"/>
+        <LETTER name="ExitSpecialOrder"/>
+        <LETTER name="Failure"/>
+        <LETTER name="GetSerialNumbers"/>
+        <LETTER name="GiftCard"/>
+        <LETTER name="GiftCardCert"/>
+        <LETTER name="HideOnScreenKeyboard"/>
+        <LETTER name="HouseAccount"/>
+        <LETTER name="Invalid"/>
+        <LETTER name="Item"/>
+        <LETTER name="ItemInquiry" />
+        <LETTER name="ItemsFound"/>
+        <LETTER name="Logoff"/>
+        <LETTER name="Manager"/>
+        <LETTER name="Next"/>
+        <LETTER name="NoSale"/>
+        <LETTER name="NotValid"/>
+        <LETTER name="Offline"/>
+        <LETTER name="Ok"/>
+        <LETTER name="Override"/>
+        <LETTER name="Pos"/>
+        <LETTER name="Pricing"/>
+        <LETTER name="QueueFull"/>
+        <LETTER name="Redeem"/>
+        <LETTER name="ReprintReceipt"/>
+        <LETTER name="Retry"/>
+        <LETTER name="Return"/>
+        <LETTER name="ReturnItem"/>
+        <LETTER name="ScanSheet" />
+        <LETTER name="Search"/>
+        <LETTER name="Size"/>
+        <LETTER name="Skip"/>
+        <LETTER name="SpecialOrder"/>
+        <LETTER name="Success"/>
+        <LETTER name="SuspendedTransaction"/>
+        <LETTER name="Tender"/>
+        <LETTER name="TillFunctionsContinue"/>
+        <LETTER name="TimeoutComplete">
+            <COMMENT >
+                Afer SaveCancelTransaction has completed for a
+                transaction timeout, this letter is mailed to exit
+                the service
+            </COMMENT>
+        </LETTER>
+        <LETTER name="TooMany"/>
+        <LETTER name="TrainingOn"/>
+        <LETTER name="Transaction"/>
+        <LETTER name="Undo"/>
+        <LETTER name="UpdateShippingCharge"/>
+        <LETTER name="Valid"/>
+        <LETTER name="VoidedTransaction"/>
+
+        <!-- GD-341: Add parameter to bypass customer capture in POS -->
+        <!-- lcatania (Starmount) Apr 9, 2013 -->
+        <SHUTTLE class="GDYNCustomerLaunchShuttle" package="com.gdyn.orpos.pos.services.sale" />
+        <!-- End GD-341: Add parameter to bypass customer capture in POS -->
+        <SHUTTLE class="CustomerReturnShuttle"/>
+        <SHUTTLE class="DisplaySendMethodLaunchShuttle"/>
+        <SHUTTLE class="FinancialCargoShuttle" package="oracle.retail.stores.pos.services.common"/>
+        <SHUTTLE class="GiftOptionsLaunchShuttle"/>
+        <SHUTTLE class="GiftOptionsReturnShuttle"/>
+        <SHUTTLE class="InstantCreditLaunchShuttle"/>
+        <SHUTTLE class="InstantCreditReturnShuttle"/>
+        <SHUTTLE class="ItemInquiryLaunchShuttle" />
+        <SHUTTLE class="ItemInquiryReturnShuttle" />
+        <SHUTTLE class="ItemLookupLaunchShuttle"/>
+        <SHUTTLE class="ItemLookupReturnShuttle"/>
+        <SHUTTLE class="ModifyItemLaunchShuttle"/>
+        <SHUTTLE class="ModifyItemReturnShuttle"/>
+        <SHUTTLE class="ModifyItemSerialNumberLaunchShuttle" package="oracle.retail.stores.pos.services.sale"/>
+        <SHUTTLE class="ModifyItemSerialNumberReturnShuttle" package="oracle.retail.stores.pos.services.sale"/>
+        <SHUTTLE class="ModifyTransactionLaunchShuttle"/>
+        <SHUTTLE class="ModifyTransactionReturnShuttle"/>
+        <SHUTTLE class="PricingLaunchShuttle"/>
+        <SHUTTLE class="GDYNPricingReturnShuttle" package="com.gdyn.orpos.pos.services.sale" />
+        <SHUTTLE class="RedeemLaunchShuttle"/>
+        <SHUTTLE class="RedeemReturnShuttle"/>
+        <SHUTTLE class="RelatedItemLaunchShuttle"/>
+        <SHUTTLE class="ReprintReceiptLaunchShuttle"/>
+        <SHUTTLE class="ReturnLaunchShuttle"/>
+        <SHUTTLE class="ReturnReturnShuttle"/>
+        <SHUTTLE class="ReverseTenderAuthLaunchShuttle"/>
+        <SHUTTLE class="SaleLaunchShuttle"/>
+        <SHUTTLE class="SaleReturnShuttle"/>
+        <SHUTTLE class="ScanSheetLaunchShuttle" package="oracle.retail.stores.pos.services.sale.scansheet"/>
+        <SHUTTLE class="ScanSheetReturnShuttle" package="oracle.retail.stores.pos.services.sale.scansheet"/>
+        <SHUTTLE class="SecurityOverrideLaunchShuttle" package="oracle.retail.stores.pos.services.admin.security.common"/>
+        <SHUTTLE class="SetupRegisterReturnShuttle"/>
+        <SHUTTLE class="SetupRegisterShuttle"/>
+        <SHUTTLE class="SpecialOrderLaunchShuttle"/>
+        <SHUTTLE class="SpecialOrderReturnShuttle"/>
+        <SHUTTLE class="TillFunctionLaunchShuttle"/>
+        
+        <!-- modified by vivek to extend SaleLaunchShuttle  -->
+        <SHUTTLE class="GDYNSaleLaunchShuttle"  package="com.gdyn.orpos.pos.services.sale"/>
+
+        <SIGNAL  class="IsCustomerInfoSignal" package="oracle.retail.stores.pos.services.sale"/>
+        <SIGNAL  class="IsLayawayTransactionSignal"/>
+        <SIGNAL  class="IsNotCustomerInfoSignal" package="oracle.retail.stores.pos.services.sale"/>
+        <SIGNAL  class="IsNotLayawayTransactionSignal"/>
+        <SIGNAL  class="IsSpecialOrderTransactionSignal"/>
+        <SIGNAL  class="IsTransactionCancelRequiredSignal"/>
+
+        <SITEACTION class="AddItemSite"/>
+        <SITEACTION class="CheckAccessSite" package="oracle.retail.stores.pos.services.admin.security.common"/>
+        <SITEACTION class="CheckForQueueFullSite"/>
+        <SITEACTION class="CheckForSendSite"/>
+        <SITEACTION class="CheckForTrainingModeSite"/>
+        <SITEACTION class="CheckRelatedItemDeletableSite"/>
+        <SITEACTION class="CheckTransactionLevelSendAssignedSite"/>
+        <SITEACTION class="EnterItemInfoSite" package="oracle.retail.stores.pos.services.common"/>
+        <SITEACTION class="EnterItemSizeSite" package="oracle.retail.stores.pos.services.common"/>
+        <SITEACTION class="PrintCancelTransactionSite" package="oracle.retail.stores.pos.services.common"/>
+        <SITEACTION class="SaveCanceledTransactionSite" package="oracle.retail.stores.pos.services.common"/>
+        <SITEACTION class="GDYNShowSaleScreenSite" package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="StartSaleSite"/>
+        <SITEACTION class="UpdateShippingChargeSite"/>
+        
+        <!-- Starts Modification by Vivek for adding new sites for Loyalty enhancement -->
+        <SITEACTION class="GDYNEnterLoyaltyIdBeforeSaleSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNValidateLoyaltyIdBeforeSaleSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNEnterEmailIdBeforeSaleSite"  package="com.gdyn.orpos.pos.services.sale"/>
+         
+       <!-- <SITEACTION class="GDYNEnterLoyaltyIdBeforeTenderingSite"  package="com.gdyn.orpos.pos.services.sale"/>-->
+        <SITEACTION class="GDYNValidateLoyaltyIdBeforeTenderingSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNEnterEmailIdBeforeTenderingSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNEnterPhoneNoBeforeTenderingSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        
+       <SITEACTION class="GDYNEnterLoyaltyIdSite"  package="com.gdyn.orpos.pos.services.sale"/>
+       
+       	<!-- Starts Modification by Dharmendra for adding new sites for Loyalty Coupon redemption -->
+       <SITEACTION class="GDYNEnterPhoneNoBeforeSaleSite"  package="com.gdyn.orpos.pos.services.sale"/>
+       
+  	<!-- Starts Modification by Ajay for adding new sites for Loyalty Coupon redemption -->
+        <SITEACTION class="GDYNAddCouponToTransactionSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNCallLoyaltyWebserviceSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNCheckForLoyaltyIDSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNCheckForLoyaltyCouponSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNEnterLoyaltyIdBeforeWebserviceCallSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        <SITEACTION class="GDYNCheckIfLoyaltyIDCapturedForCouponSite"  package="com.gdyn.orpos.pos.services.sale"/>
+        
+       
+        
+        
+    </SERVICECODE>
+    <MAP >
+        <REGION  region="SERVICE" startsite="StartSale">
+            <SITE name="StartSale" siteaction="StartSaleSite">
+                <COMMENT>
+                    This site checks to see if the system is configured
+                    as POS.
+                </COMMENT>
+                <ROAD
+                    name="SystemPOS"
+                    letter="Pos"
+                    destination="InitStation"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="ON">
+                 <COMMENT>
+                        This road is traveled when the system is configured
+                        as POS.
+                 </COMMENT>
+                </ROAD>
+
+            </SITE>
+            <STATION
+                name="InitStation"
+                servicename="sale.initialize.initialize"
+                targettier="APPLICATIONTIER"
+                launchshuttle="SaleLaunchShuttle"
+                returnshuttle="SaleReturnShuttle">
+                <COMMENT >
+                    Login Cashier, check access and get cashiers open
+                    till
+                </COMMENT>
+                <ROAD
+                    name="InitRegisterContinue"
+                    letter="Continue"
+                    destination="CheckForQueueFull"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InitRegisterFailed"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InitRegisterCancel"
+                    letter="Cancel"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InitRegisterOffline"
+                    letter="Offline"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InitRegisterTimeout"
+                    letter="TimeoutComplete"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                 <COMMENT >
+                        Timeout of Service
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="InitRegisterQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+            </STATION>
+            <SITE  name="CheckForQueueFull" siteaction="CheckForQueueFullSite">
+                <ROAD
+                    name="CanWriteToQueue"
+                    letter="Continue"
+                    destination="CheckForTrainingMode"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="QueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+            </SITE>
+            <STATION
+                name="CompleteSaleStation"
+                servicename="sale.complete.completesale"
+                targettier="APPLICATIONTIER"
+                launchshuttle="GDYNSaleLaunchShuttle"
+                returnshuttle="SaleReturnShuttle">
+                <ROAD
+                    name="SaleCompleted"
+                    letter="ExitCompleteSale"
+                    destination="StartSale"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ActivationCancelled"
+                    letter="ActivationCancelled"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CompleteSaleQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="TimeoutInCompleteSaleStation"
+                    letter="Timeout"
+                    destination="SaveCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="ValidateSaleStation"
+                servicename="sale.validate.validate"
+                targettier="APPLICATIONTIER"
+                launchshuttle="SaleLaunchShuttle"
+                returnshuttle="SaleReturnShuttle">
+                <ROAD
+                    name="ValidationUndo"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ValidationError"
+                    letter="Ok"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ValidationCancel"
+                    letter="Cancel"
+                    destination="InitStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                 <LIGHT  signal="IsNotLayawayTransactionSignal"/>
+                </ROAD>
+                <ROAD
+                    name="ValidationCancelLayawayTransaction"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns with a Cancel letter.
+                 </COMMENT>
+                 <LIGHT  signal="IsLayawayTransactionSignal"/>
+                </ROAD>
+                <ROAD
+                    name="ValidationFailed"
+                    letter="Failure"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ValidationSucceded"
+                    letter="Success"
+                    destination="CompleteSaleStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ValidationSuccededLayawayExit"
+                    letter="ExitLayaway"
+                    destination="InitStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ValidateQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                      name="TimeoutValidateSaleStation"
+                      letter="Timeout"
+                      destination="SaveCancelTransaction"
+                      tape="ADVANCE"
+                      record="OFF"
+                      index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="DemographicsStation"
+                servicename="sale.demographic.demographic"
+                targettier="APPLICATIONTIER"
+                launchshuttle="SaleLaunchShuttle"
+                returnshuttle="SaleReturnShuttle">
+                <!-- Modified for Loyalty Enhancement Re routing to the Loyalty Screen before going to the ShowSaleScreen-->
+                <ROAD
+                    name="DemographicsCollected"
+                    letter="Success"
+                    destination="EnterLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="DemographicsNotCollected"
+                    letter="Continue"
+                    destination="EnterLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="DemographicSkipped"
+                    letter="Skip"
+                    destination="EnterLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="UndoDemographics"
+                    letter="Undo"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Leaves the service
+                 </COMMENT>
+                </ROAD>
+            </STATION>
+            
+            <!-- Starts Modification by Vivek for Loyalty Enhancement Evaluate the Loyalty ID before going to the ShowSaleScreen-->
+            
+            <SITE  name="EnterLoyaltyIdBeforeSale" siteaction="GDYNEnterLoyaltyIdBeforeSaleSite">
+                <ROAD
+                    name="LoyaltyEntered"
+                    letter="Next"
+                    laneaction="GDYNLoyaltyIdEnteredRoad"
+                    destination="ValidateLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="EmailSelected"
+                    letter="Email"
+                    destination="EnterEmailIdBeforeSale"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                 <ROAD
+                    name="PhoneNoSelected"
+                    letter="PhoneNo"
+                    destination="EnterPhoneNoBeforeSale"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="LoyaltyNotEnabled"
+                    letter="Continue"
+                    laneaction="GDYNLoyaltyIdEnteredRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+             </SITE>
+             <SITE  name="EnterEmailIdBeforeSale" siteaction="GDYNEnterEmailIdBeforeSaleSite">
+                <ROAD
+                    name="EmailIdEntered"
+                    letter="Next"
+                    laneaction="GDYNEmailIdEnteredRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="EmailSelected"
+                    letter="Undo"
+                    destination="EnterLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+             </SITE>
+             
+              <!-- Starts Modification by Dharmendra-->
+             
+              <SITE  name="EnterPhoneNoBeforeSale" siteaction="GDYNEnterPhoneNoBeforeSaleSite">
+                <ROAD
+                    name="EmailIdEntered"
+                    letter="Next"
+                    laneaction="GDYNPhoneNoEnteredRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="EmailSelected"
+                    letter="Undo"
+                    destination="EnterLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+             </SITE>
+            
+            <SITE  name="ValidateLoyaltyIdBeforeSale" siteaction="GDYNValidateLoyaltyIdBeforeSaleSite">
+                <AISLE
+                    name="ValidationSuccess"
+                    letter="Success"
+                    laneaction="GDYNContinueConversionAisle">
+                    <COMMENT >
+                        This aisle is traversed to convert the current letter
+                        to cancel
+                    </COMMENT>
+                </AISLE>
+                <ROAD
+                    name="LoyaltyValidated"
+                    letter="Continue"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="LoyaltyIdValidateFailed"
+                    letter="Ok"
+                    destination="EnterLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD> 
+                <ROAD
+                    name="LoyaltyIdCapturedForCoupon"
+                    letter="Check"
+                    destination="CheckIfLoyaltyIDCapturedForCoupon"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD> 
+                
+             </SITE>             
+             <!--  <SITE  name="EnterLoyaltyIdBeforeTendering" siteaction="GDYNEnterLoyaltyIdBeforeTenderingSite">
+                <ROAD
+                    name="LoyaltyEntered"
+                    letter="Next"
+                    laneaction="GDYNLoyaltyIdEnteredRoad"
+                    destination="ValidateLoyaltyIdBeforeTendering"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="EmailSelected"
+                    letter="Email"
+                    destination="EnterEmailIdBeforeTendering"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="LoyaltyNotEnabled"
+                    letter="Continue"
+                    destination="ValidateSaleStation"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+             </SITE>-->
+             
+             <SITE  name="EnterEmailIdBeforeTendering" siteaction="GDYNEnterEmailIdBeforeTenderingSite">
+                <ROAD
+                    name="EmailIdEntered"
+                    letter="Next"
+                    laneaction="GDYNEmailIdEnteredRoad"
+                    destination="ValidateSaleStation"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="EmailSelected"
+                    letter="Undo"
+                    destination="EnterLoyaltyOrEmail"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="LoyaltyEmailAlreadyEnterted"
+                    letter="Continue"
+                    destination="ValidateSaleStation"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+             </SITE>
+             <SITE  name="EnterPhoneNoBeforeTendering" siteaction="GDYNEnterPhoneNoBeforeTenderingSite">
+            
+          		  <ROAD
+                    name="LoyaltyPhoneNoNotEntered"
+                    laneaction="GDYNPhoneNoEnteredRoad"
+                    letter="Next"
+                    destination="ValidateSaleStation"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                 <ROAD
+                    name="LoyaltyPhoneNoAlreadyEnterted"
+                    letter="Continue"
+                    destination="ValidateSaleStation"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+             </SITE>
+             
+            <SITE  name="ValidateLoyaltyIdBeforeTendering" siteaction="GDYNValidateLoyaltyIdBeforeTenderingSite">
+                <AISLE
+                    name="ValidationSuccess"
+                    letter="Success"
+                    laneaction="ContinueConversionAisle">
+                    <COMMENT >
+                        This aisle is traversed to convert the current letter
+                        to cancel
+                    </COMMENT>
+                </AISLE>
+                <ROAD
+                    name="LoyaltyValidated"
+                    letter="Continue"
+                    destination="ValidateSaleStation"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="LoyaltyIdValidateFailed"
+                    letter="Ok"
+                    destination="EnterLoyaltyOrEmail"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD> 
+             </SITE>    
+         	 <SITE  name="EnterLoyaltyOrEmail" siteaction="GDYNEnterLoyaltyIdSite">
+          	   <ROAD
+                    name="LoyaltyEntered"
+                    letter="Next"
+                    laneaction="GDYNLoyaltyIdEnteredRoad"
+                    destination="ValidateLoyaltyIdBeforeTendering"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="EmailSelected"
+                    letter="Email"
+                    destination="EnterEmailIdBeforeTendering"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="phoneNoSelected"
+                    letter="PhoneNo"
+                    destination="EnterPhoneNoBeforeTendering"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+               </SITE>
+            <!-- End Modification by Vivek for Loyalty Enhancement Evaluate the Loyalty ID before going to the ShowSaleScreen -->
+            
+            <STATION name="InstantCreditStation" servicename="services.instantcredit.instantcredit"
+               targettier="CURRENTTIER"
+               launchshuttle="InstantCreditLaunchShuttle"
+               returnshuttle="InstantCreditReturnShuttle">
+               <ROAD name="InstantCreditReturnedContinue"
+                     letter="Continue"
+                     destination="ShowSaleScreen"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="ON">
+               </ROAD>
+               <ROAD name="InstantCreditReturnedNext"
+                     letter="Next"
+                     destination="ShowSaleScreen"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="ON">
+               </ROAD>
+               <ROAD name="NonTransactionEnrollment"
+                        letter="Valid"
+                        destination="ShowSaleScreen"
+                        tape="ADVANCE"
+                        record="OFF"
+                        index="ON">
+               </ROAD>
+               <ROAD name="CancelInstantCredit"
+                     letter="Cancel"
+                     destination="ShowSaleScreen"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="OFF">
+               </ROAD>
+               <ROAD name="InstantCreditExitPayment"
+                     letter="ExitPayment"
+                     destination="InitStation"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="ON">
+               </ROAD>
+               <ROAD name="UndoInstantCredit"
+                     letter="Undo"
+                     destination="ShowSaleScreen"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="OFF">
+               </ROAD>
+               <ROAD name="InstantCreditFailure"
+                     letter="Failure"
+                     destination="ShowSaleScreen"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="ON">
+               </ROAD>
+               <ROAD name="InstantCreditOffline"
+                     letter="Offline"
+                     destination="ShowSaleScreen"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="ON">
+               </ROAD>
+               <ROAD
+                     name="TimeoutInstantCreditStation"
+                     letter="Timeout"
+                     destination="SaveCancelTransaction"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="OFF">
+               </ROAD>
+               <ROAD
+                    name="InstantCreditQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="RedeemStation"
+                servicename="services.redeem.redeem"
+                targettier="CURRENTTIER"
+                launchshuttle="RedeemLaunchShuttle"
+                returnshuttle="RedeemReturnShuttle">
+
+                <ROAD
+                    name="RedeemComplete"
+                    letter="Continue"
+                    destination="InitStation"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoRedeem"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelRedeem"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="FailureRedeem"
+                    letter="Failure"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="QueueFullRedeem"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <SITE  name="ShowSaleScreen" siteaction="GDYNShowSaleScreenSite">
+                <COMMENT >
+                    This site displays the SELL_ITEM screen.
+                </COMMENT>
+                <AISLE
+                    name="CancelSelected"
+                    letter="Cancel"
+                    laneaction="CancelSelectedAisle">
+                 <COMMENT >
+                        Traversed when cancel is selected.
+                 </COMMENT>
+                </AISLE>
+                <AISLE
+                    name="ItemNumberEntered"
+                    letter="Next"
+                    laneaction="ItemNumberEnteredAisle">
+                 <COMMENT >
+                        This aisle is traveled when an item number has been
+                        entered and is not empty.
+                 </COMMENT>
+                </AISLE>
+                <AISLE
+                    name="HideOnScreenKeyboard"
+                    letter="HideOnScreenKeyboard"
+                    laneaction="HideOnScreenKeyboardAisle">
+                 <COMMENT >
+                        This aisle hides the on screen keyboard if the trans has just started.
+                 </COMMENT>
+                </AISLE>
+                <ROAD
+                    name="ClearSelected"
+                    letter="Clear"
+                    destination="CheckRelatedItemDeletable"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This aisle is traversed when the user presses the
+                        Clear key from the SELL_ITEM screen. The system will check for
+                        send item before delete
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ValidItemNumberEntered"
+                    letter="Valid"
+                    destination="ItemLookupStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT>
+                        This road is traveled when the item number
+                        entered has been validated.
+                 </COMMENT>
+                </ROAD>
+                <!-- <ROAD
+                    name="TenderSelected"
+                    letter="Tender"
+                    destination="ValidateLoyaltyIdBeforeTendering"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the user presses the Tender
+                        key.
+                 </COMMENT>
+                </ROAD> -->
+                <ROAD
+                    name="TenderSelected"
+                    letter="Tender"
+                    destination="ValidateLoyaltyIdBeforeTendering"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the user presses the Tender
+                        key.
+                 </COMMENT>
+                </ROAD> 
+                <ROAD
+                    name="ModifyTransactionSelected"
+                    letter="Transaction"
+                    destination="ModifyTransactionStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the user presses the Transaction
+                        key.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CustomerSelected"
+                    letter="Customer"
+                    destination="CustomerStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Road to traverse when the user presses the Customer
+                        button.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ReturnSelected"
+                    letter="Return"
+                    destination="ReturnStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed when the user selects Return
+                        off the menu.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="UndoSelected"
+                    letter="Undo"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Leaves the service
+                 </COMMENT>
+                 <LIGHT  signal="IsNotCustomerInfoSignal"/>
+
+                </ROAD>
+                <ROAD
+                    name="NoSaleSelected"
+                    letter="NoSale"
+                    destination="NoSaleStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the user presses the No
+                        Sale key.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="SaleScreenError"
+                    letter="Ok"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when an error is encountered
+                        during sale time.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ManagerSelected"
+                    letter="Manager"
+                    destination="ManagerStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="ReprintReceiptSelected"
+                    letter="ReprintReceipt"
+                    destination="ReprintReceiptStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="HouseAccountSelected"
+                    letter="HouseAccount"
+                    destination="InstantCreditStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="RedeemSelected"
+                    letter="Redeem"
+                    destination="RedeemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="TillFunctionsSelected"
+                    letter="TillFunctionsContinue"
+                    destination="TillFunctionStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="SpecialOrderSelected"
+                    letter="SpecialOrder"
+                    destination="SpecialOrderStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="PricingSelected"
+                    letter="Pricing"
+                    laneaction="ModifyItemSelectedRoad"
+                    destination="PricingStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road travels to the pricing station after the
+                        user has selected pricing.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="GiftCardCertSelected"
+                    letter="GiftCardCert"
+                    destination="GiftOptionsStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelSale"
+                    letter="Override"
+                    destination="CheckAccess"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                 <COMMENT>
+                        This road is traveled when the user presses the Cancel
+                        key from the SELL_ITEM screen.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifiedItemSelected"
+                    letter="Item"
+                    laneaction="ModifyItemSelectedRoad"
+                    destination="ModifyItemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="UndoWithCustomerInfoSelected"
+                    letter="Undo"
+                    destination="DemographicsStation"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                 <LIGHT  signal="IsCustomerInfoSignal"/>
+                </ROAD>
+                <ROAD
+                    name="CancelTransactionOnTimeout"
+                    letter="Timeout"
+                    destination="SaveCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ItemInquirySelected"
+                    letter="ItemInquiry"
+                    destination="ItemInquiryStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ScanSheetSelected"
+                    letter="ScanSheet"
+                    destination="ScanSheetStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE  name="CheckAccess" siteaction="CheckAccessSite">
+                <ROAD
+                    name="OverrideRequired"
+                    letter="Override"
+                    destination="SecurityOverrideStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelTransactionAccessGranted"
+                    letter="Continue"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE  name="CheckForTrainingMode" siteaction="CheckForTrainingModeSite">
+                <ROAD
+                    name="SetupTrainingModeRegisterRequired"
+                    letter="TrainingOn"
+                    destination="SetupRegisterStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="NotInTrainingMode"
+                    letter="Continue"
+                    destination="DemographicsStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE name="CheckRelatedItemDeletable" siteaction="CheckRelatedItemDeletableSite">
+                <ROAD
+                    name="RelatedItemDeleteAllowed"
+                    letter="Continue"
+                    destination="CheckForSend"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="RelatedItemDeleteFailure"
+                    letter="Failure"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE name="CheckForSend" siteaction="CheckForSendSite">
+                <ROAD
+                    name="UpdateShippingSelected"
+                    letter="UpdateShippingCharge"
+                    destination="CheckTransactionLevelSendAssigned"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This aisle is traversed when pass from CheckForSend
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="FailureDeleteSend"
+                    letter="Failure"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Not allow to delete items from multiple sends.
+                 </COMMENT>
+                </ROAD>
+            </SITE>
+            <SITE name="CheckTransactionLevelSendAssigned" siteaction="CheckTransactionLevelSendAssignedSite">
+                <ROAD
+                    name="UpdateShippingSelected"
+                    letter="Next"
+                    destination="UpdateShippingCharge"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This aisle is traversed when pass from CheckForSend
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="DeleteSelected"
+                    letter="Continue"
+                    laneaction="DeleteItemRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <SITE name="UpdateShippingCharge" siteaction="UpdateShippingChargeSite">
+                <ROAD
+                    name="DeleteSelected"
+                    letter="Delete"
+                    laneaction="DeleteItemRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        No need to change shipping method if not send item, or remove
+                        all the items from a send.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ChangeShippingMethodSelected"
+                    letter="ChangeShippingMethod"
+                    laneaction="DeleteItemRoad"
+                    destination="DisplaySendMethodStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        need to change shipping method, if part of items in a send are
+                        deleted.
+                 </COMMENT>
+                </ROAD>
+            </SITE>
+
+            <STATION
+                name="ItemInquiryStation"
+                servicename="inquiry.iteminquiry.ItemInquiry"
+                targettier="APPLICATIONTIER"
+                launchshuttle="ItemInquiryLaunchShuttle"
+                returnshuttle="ItemInquiryReturnShuttle">
+                <COMMENT >
+                   Includes Advanced Item Search
+                </COMMENT>
+                <AISLE
+                    name="CheckForSizeRequired"
+                    letter="Add"
+                    laneaction="CheckIfSizeRequiredAisle">
+                </AISLE>
+                <ROAD
+                    name="EnterSize"
+                    letter="Size"
+                    destination="EnterItemSize"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InquiryDone"
+                    letter="Next"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InquiryCancelled"
+                    letter="Cancel"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                 <LIGHT  signal="IsTransactionCancelRequiredSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="InquiryCancelTransaction"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <LIGHT  signal="IsTransactionCancelRequiredSignal"/>
+                </ROAD>
+                <ROAD
+                    name="UndoInquiry"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InquiryInvalid "
+                    letter="Invalid"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ItemAdd"
+                    letter="Continue2"
+                    destination="AddItem"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="SetupRegisterStation"
+                servicename="dailyoperations.common.setupregister"
+                targettier="CURRENTTIER"
+                launchshuttle="SetupRegisterShuttle"
+                returnshuttle="SetupRegisterReturnShuttle">
+                <ROAD
+                    name="LookupStoreStatusExit"
+                    letter="Failure"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Aisle to traverse when there is a database or other
+                        unexpected error on the store-status lookup. Because
+                        the hard totals do not contain the business date,
+                        the service exits.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="Exit"
+                    letter="Ok"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Road to traverse when no register parameter is found.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="LookupRegisterContinue"
+                    letter="Continue"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Road to traverse when a register lookup is complete.
+                 </COMMENT>
+                </ROAD>
+            </STATION>
+            <STATION
+                name="SecurityOverrideStation"
+                servicename="security.override.override"
+                targettier="CURRENTTIER"
+                launchshuttle="SecurityOverrideLaunchShuttle">
+                <ROAD
+                    name="CancelTransactionSecurityOverrideSucceeded"
+                    letter="Success"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelTransactionSecurityOverrideFailed"
+                    letter="Failure"
+                    destination="LastIndexed"
+                    tape="SPLICE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="PricingStation"
+                servicename="services.pricing.pricing"
+                targettier="CURRENTTIER"
+                launchshuttle="PricingLaunchShuttle"
+                returnshuttle="GDYNPricingReturnShuttle">
+                <COMMENT >
+                    This station starts the pricing service
+                </COMMENT>
+                <ROAD
+                    name="PricingUndo"
+                    letter="Undo"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed when escape has been pressed
+                        from the pricing options screen.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="PricingComplete"
+                    letter="Next"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the pricing service is
+                        returns succesfully
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="PricingUndone"
+                    letter="Undo"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the pricing service is
+                        undone.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="PricingCanceled"
+                    letter="Cancel"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the pricing service is
+                        cancled.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ContinuePriceAdjustment"
+                    letter="Continue"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road goes to the Show Sale Screen.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="FailurePriceAdjustment"
+                    letter="Failure"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed in a Failure letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ExitPriceAdjustment"
+                    letter="Exit"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed in a Exit letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="OkLetterPriceAdjustment"
+                    letter="Ok"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed in a Ok letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="SuccessPriceAdjustment"
+                    letter="Success"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed in a Success letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ItemsFoundPriceAdjustment"
+                    letter="ItemsFound"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed in a ItemsFound letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="TransactionNotFoundPriceAdjustment"
+                    letter="ReturnItem"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed in a ReturnItem letter when no transaction is found.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="InvalidReadTransaction"
+                    letter="Invalid"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Transaction read is invalid for return such as house
+                        account payment transaction.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                     name="TimeoutPricingStation"
+                     letter="Timeout"
+                     destination="SaveCancelTransaction"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="OFF">
+               </ROAD>
+            </STATION>
+            <STATION
+                name="TillFunctionStation"
+                servicename="till.tilloptions.tilloptions"
+                targettier="CURRENTTIER"
+                launchshuttle="TillFunctionLaunchShuttle"
+                returnshuttle="FinancialCargoShuttle">
+                <COMMENT >
+                    This station is the transfer point for the till service.
+                </COMMENT>
+                <AISLE
+                    name="TillFunctionFailure"
+                    letter="Failure"
+                    laneaction="CancelLetterAisle">
+                 <COMMENT >
+                        This aisle is traversed to convert the current letter
+                        to cancel
+                 </COMMENT>
+                </AISLE>
+                <AISLE
+                    name="TillFunctionUndo"
+                    letter="Undo"
+                    laneaction="CancelLetterAisle">
+                 <COMMENT >
+                        This aisle is traversed to convert the current letter
+                        to cancel
+                 </COMMENT>
+                </AISLE>
+                <ROAD
+                    name="TillFunctionCancel"
+                    letter="Cancel"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Till Function service
+                        returns.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="TillFunctionSuccess"
+                    letter="Success"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Till Function service
+                        returns with a Success letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="TillFunctionLogoff"
+                    letter="Logoff"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Till Function service
+                        returns with a Logoff letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                     name="TimeoutTillFunctionStation"
+                     letter="Timeout"
+                     destination="SaveCancelTransaction"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="OFF">
+               </ROAD>
+               <ROAD
+                    name="TillFunctionsQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <SITE  name="PrintCancelTransaction" siteaction="PrintCancelTransactionSite">
+                <COMMENT >
+                    This site prints the canceled transaction receipt.
+                </COMMENT>
+                <ROAD
+                    name="CancelTransactionReceiptPrinted"
+                    letter="Continue"
+                    destination="SaveCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed when the cancel transaction receipt
+                        is successfully printed or when the printer is offline
+                        and the operator selects continue.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="PrintCancelTransactionRetry"
+                    letter="Retry"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed when the printer is offline
+                        and the operator selects retry.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                   name="PrintCancelTransactionTimeout"
+                   letter="Timeout"
+                   destination="InitStation"
+                   tape="ADVANCE"
+                   record="OFF"
+                   index="OFF">
+                <COMMENT >
+                       Afer Printing Cancel Transaction for a transaction timeout,
+                       this letter is mailed to return to main log in screen
+                </COMMENT>
+               </ROAD>
+            </SITE>
+            <SITE  name="SaveCancelTransaction" siteaction="SaveCanceledTransactionSite">
+                <COMMENT >
+                    This site saves the current canceled transaction.
+                </COMMENT>
+                <ROAD
+                    name="TransactionCanceled"
+                    letter="Continue"
+                    destination="InitStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="TransactionCanceledTimeout"
+                    letter="Timeout"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT>
+                       When Transaction timeout happens this letter
+                       is mailed to print cancelled transaction receipt.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="TransactionCanceledRetry"
+                    letter="Retry"
+                    destination="SaveCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="TransactionCanceledQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <STATION
+                name="ReprintReceiptStation"
+                servicename="services.reprintreceipt.reprintreceipt"
+                targettier="CURRENTTIER"
+                launchshuttle="ReprintReceiptLaunchShuttle">
+                <COMMENT >
+                    This station is the transfer point for the reprint
+                    receipt.
+                </COMMENT>
+                <ROAD
+                    name="ReprintReceiptReturned"
+                    letter="Next"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Reprint Receipt service
+                        returns.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CancelReprintReceipt"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Reprint Receipt service
+                        returns with a Cancel letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="UndoReprintReceipt"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Reprint Receipt service
+                        returns with an Undo letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="FailureReprintReceipt"
+                    letter="Failure"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Reprint Receipt service
+                        returns with a Failure letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="SuccessReprintReceipt"
+                    letter="Success"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Reprint Receipt service
+                        returns with a Success letter.
+                 </COMMENT>
+                </ROAD>
+            </STATION>
+            <STATION
+                name="NoSaleStation"
+                servicename="services.nosale.nosale"
+                targettier="CURRENTTIER"
+                launchshuttle="FinancialCargoShuttle"
+                returnshuttle="FinancialCargoShuttle">
+                <COMMENT >
+                    This station is the launch point for the No Sale service.
+                </COMMENT>
+                <ROAD
+                    name="CancelNoSale"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the No Sale service returns
+                        with a Cancel letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="FailureNoSale"
+                    letter="Failure"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the No Sale service returns
+                        with a Failure letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="UndoNoSale"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the No Sale service returns
+                        with an Undo letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="NoSaleReturned"
+                    letter="Next"
+                    destination="InitStation"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="NoSaleQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="ModifyTransactionStation"
+                servicename="services.modifytransaction.ModifyTransaction"
+                targettier="CURRENTTIER"
+                launchshuttle="ModifyTransactionLaunchShuttle"
+                returnshuttle="ModifyTransactionReturnShuttle">
+                <COMMENT >
+                    This station is the launch point for the Modify Transaction
+                    service.
+                </COMMENT>
+                <ROAD
+                    name="ModifyTransactionReturnedFromTaxExemptNotAllowed"
+                    letter="Ok"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns due to the tax exempt not allowed.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifyTransactionReturned"
+                    letter="Next"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CancelModifyTransaction"
+                    letter="Cancel"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns with a Cancel letter.
+                 </COMMENT>
+                 <LIGHT  signal="IsNotLayawayTransactionSignal"/>
+                </ROAD>
+                <ROAD
+                    name="CancelLayawayTransaction"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns with a Cancel letter.
+                 </COMMENT>
+                 <LIGHT  signal="IsLayawayTransactionSignal"/>
+                </ROAD>
+                <ROAD
+                    name="UndoModifyTransaction"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns with an Undo letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="FailureModifyTransaction"
+                    letter="Failure"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns with a Failure letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="SuccessModifyTransaction"
+                    letter="Success"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns with a Success letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                      name="LayawayExitFromModifyTransaction"
+                       letter="ExitLayaway"
+                    destination="InitStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                      This road is traveled when the Modify Transaction
+                      service returns with a ExitLayaway letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="TransactionVoided"
+                    letter="VoidedTransaction"
+                    destination="InitStation"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="TransactionSuspended"
+                    letter="SuspendedTransaction"
+                    destination="InitStation"
+                    tape="DISCARD"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="TransactionLevelSend"
+                    letter="Done"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with a Done letter from sendmain service.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="TransactionQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelSpecialOrderTransaction"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Transaction
+                        service returns with a Cancel letter.
+                 </COMMENT>
+                 <LIGHT  signal="IsSpecialOrderTransactionSignal"/>
+                </ROAD>
+                <ROAD
+                    name="ExitSpecialOrder"
+                    letter="ExitSpecialOrder"
+                    destination="InitStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                 <COMMENT >
+                        Explicitly exit special order processing to ensure sale init occurs.
+                        This should occur whenever a tranaction occurs.
+                        This check for workstation accountability and will logout the operator if appropriate.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="BillPaymnentSuccessFull"
+                    letter="ExitCompleteSale"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                 <COMMENT >
+                        Bill Payment Successful
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                     name="TimeoutModifyTransactionStation"
+                     letter="Timeout"
+                     destination="SaveCancelTransaction"
+                     tape="ADVANCE"
+                     record="OFF"
+                     index="OFF">
+                </ROAD>
+            </STATION>
+            <!-- GD-341: Add parameter to bypass customer capture in POS -->
+            <!-- lcatania (Starmount) Apr 9, 2013 -->
+            <STATION
+                name="CustomerStation"
+                servicename="customer.main.customermain"
+                targettier="CURRENTTIER"
+                launchshuttle="GDYNCustomerLaunchShuttle"
+                returnshuttle="CustomerReturnShuttle">
+            <!-- End GD-341: Add parameter to bypass customer capture in POS -->
+                <COMMENT >
+                    Transfer control to customer services to execute
+                    Customer functionality.
+                </COMMENT>
+                <ROAD
+                    name="CustomerContinue"
+                    letter="Continue"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Road to traverse when the Customer service runs to
+                        completion.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CustomerUndo"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Road to traverse when the user backs out of the Customer
+                        service.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CustomerCancel"
+                    letter="Cancel"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Road to traverse when the user Cancels out of the Customer
+                        service.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CustomerLink"
+                    letter="Link"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT>
+                        Road to traverse when the user link of the Customer
+                        service.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CustomerOffline"
+                    letter="Offline"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Road to traverse when the user Customer service is
+                        offline
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CustomerTimeout"
+                    letter="Timeout"
+                    destination="SaveCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+
+             <STATION
+                 name="SerializedItemStation"
+                 servicename="modifyitem.serialnumber.serializedItem"
+                 targettier="CURRENTTIER"
+                 launchshuttle="ModifyItemSerialNumberLaunchShuttle"
+                 returnshuttle="ModifyItemSerialNumberReturnShuttle">
+                <COMMENT>
+                     This service prompts the user for serial number input and sets the serial number attribute
+                     for one or more line items.
+                </COMMENT>
+                <ROAD
+                     name="SerializedItemUndo"
+                     laneaction="RemoveItemRoad"
+                     letter="Undo"
+                     destination="ShowSaleScreen">
+                </ROAD>
+                <ROAD
+                     name="SerializedItemCancel"
+                     laneaction="RemoveItemRoad"
+                     letter="Cancel"
+                     destination="ShowSaleScreen">
+                </ROAD>
+                <ROAD
+                     name="DuplicateItems"
+                     laneaction="RemoveItemRoad"
+                     letter="Error"
+                     destination="ShowSaleScreen">
+                </ROAD>
+			    <!-- Begin GD-384: Only applies employee discount to items posted to sell item screen -->
+			    <!-- at time employee discount applied - not to items added afterwards -->
+			    <!-- lcatania (Starmount) Apr 26, 2013 -->
+                <ROAD
+                     name="SerialNumbersEntered"
+                     letter="Ok"
+                     laneaction="GDYNItemAddedRoad"
+                     destination="RelatedItemStation">
+                </ROAD>
+                <ROAD
+                     name="SellableRoad"
+                     letter="Sellable"
+                     laneaction="GDYNItemAddedRoad"
+                     destination="RelatedItemStation">
+                </ROAD>
+                <ROAD
+                     name="pickupDeliveryRoad"
+                     letter="Continue"
+                     laneaction="GDYNItemAddedRoad"
+                     destination="RelatedItemStation">
+                </ROAD>
+                <ROAD name="UINSuccessRoad"
+                     letter="Success"
+                     laneaction="GDYNItemAddedRoad"
+                     destination="RelatedItemStation">
+                </ROAD>
+                <!-- End GD-384: Only applies employee discount to items posted to sell item screen -->
+            </STATION>
+
+            <STATION
+                name="ModifyItemStation"
+                servicename="services.modifyitem.modifyitem"
+                targettier="CURRENTTIER"
+                launchshuttle="ModifyItemLaunchShuttle"
+                returnshuttle="ModifyItemReturnShuttle">
+                <COMMENT >
+                    This station is the launch point for the Modify Item
+                    service.
+                </COMMENT>
+                <ROAD
+                    name="UndoModifyItem"
+                    letter="Undo"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with an Undo letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ClearModifyItem"
+                    letter="Clear"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        Use this road to respond to the Clear key and return
+                        to the ShowSaleScreen site. returns with an Undo
+                        letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifyItemReturned"
+                    letter="Next"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="REWIND"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns normally. This road rewinds the tape since a
+                        constant repetition of ModifiedItemSelected road then
+                        ModifyItemReturned road will result in memory leak in
+                        the Tape.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="CancelModifyItem"
+                    letter="Cancel"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with a Cancel letter.
+                 </COMMENT>
+                 <LIGHT  signal="IsTransactionCancelRequiredSignal" negate="Y"/>
+                </ROAD>
+                <ROAD
+                    name="CancelModifyItemTransaction"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with a Cancel letter and there is a transaction
+                        that should be canceled.
+                 </COMMENT>
+                 <LIGHT  signal="IsTransactionCancelRequiredSignal"/>
+                </ROAD>
+                <ROAD
+                    name="FailureModifyItem"
+                    letter="Failure"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with a Failure letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifyItemAdded"
+                    letter="Add"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="AddItem"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with an Add letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifyItemOk"
+                    letter="Ok"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with an Ok letter from an error dialog screen.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifyItemContinue"
+                    letter="Continue"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with a Continue letter from sendmain service.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifyItemSendDone"
+                    letter="Done"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with a Done letter from sendmain service.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifyItemSuccess"
+                    letter="Success"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Modify Item service
+                        returns with a Success letter from sendmain service.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ModifyItemInvalid"
+                    letter="Invalid"
+                    laneaction="ResetItemSelectedRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="ReturnStation"
+                servicename="returns.returnoptions.returnoptions"
+                targettier="CURRENTTIER"
+                launchshuttle="ReturnLaunchShuttle"
+                returnshuttle="ReturnReturnShuttle">
+                <COMMENT >
+                    This station goes to the Return service.
+                </COMMENT>
+                <ROAD
+                    name="CancelReturnStation"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road goes to create a new transaction.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ContinueReturnStation"
+                    letter="Continue"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road goes to the Show Sale Screen.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="UndoReturnStation"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road goes to the ShowSaleScreen.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="FailureReturnStation"
+                    letter="Failure"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed in a Success letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="SuccessReturnStation"
+                    letter="Success"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traversed in a Success letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="TimeoutReturnStation"
+                    letter="Timeout"
+                    destination="SaveCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road goes to the ShowSaleScreen, after a return was timed out.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ReturnOptionsQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="ManagerStation"
+                servicename="services.manager.manager"
+                targettier="APPLICATIONTIER"
+                launchshuttle="FinancialCargoShuttle">
+                <ROAD
+                    name="CancelSelected"
+                    letter="Cancel"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoSelected"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+
+            <STATION
+                name="GiftOptionsStation"
+                servicename="services.giftoptions.giftoptions"
+                targettier="APPLICATIONTIER"
+                launchshuttle="GiftOptionsLaunchShuttle"
+                returnshuttle="GiftOptionsReturnShuttle">
+                <ROAD
+                    name="AddGiftCardItem"
+                    letter="Continue"
+                    destination="AddItem"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoGiftCardOptionsSelected"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="GiftCardOptionsCompleted"
+                    letter="Success"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelGiftCardOptionsSelected"
+                    letter="Cancel"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <SITE  name="EnterItemSize" siteaction="EnterItemSizeSite">
+                <AISLE
+                    name="ValidateItemSize"
+                    letter="Next"
+                    laneaction="ValidateItemSizeAisle">
+                </AISLE>
+                <AISLE
+                    name="DisplayItemSizeDialog"
+                    letter="Invalid"
+                    laneaction="DisplayItemSizeDialogAisle">
+                </AISLE>
+                <ROAD
+                    name="ItemSizeReenter"
+                    letter="Ok"
+                    destination="EnterItemSize"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="AddItemRoad"
+                    letter="Search"
+                    destination="AddItem"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelEnterItemSize"
+                    laneaction="RemoveItemRoad"
+                    letter="Cancel"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoEnterItemSize"
+                    laneaction="RemoveItemRoad"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </SITE>
+            <STATION
+                name="SpecialOrderStation"
+                servicename="services.specialorder.specialorder"
+                targettier="CURRENTTIER"
+                launchshuttle="SpecialOrderLaunchShuttle"
+                returnshuttle="SpecialOrderReturnShuttle">
+                <COMMENT >
+                    This station is the transfer point for the special
+                    order service.
+                </COMMENT>
+                <AISLE
+                    name="SpecialOrderFailure"
+                    letter="Failure"
+                    laneaction="CancelLetterAisle">
+                 <COMMENT >
+                        This aisle is traversed to convert the current letter
+                        to cancel
+                 </COMMENT>
+                </AISLE>
+                <ROAD
+                    name="SpecialOrderSuccess"
+                    letter="Success"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the special order service
+                        returns with a Success letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="SpecialOrderUndo"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the special order service
+                        returns with a Undo letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="SpecialOrderCancel"
+                    letter="Cancel"
+                    destination="PrintCancelTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Till Function service
+                        returns.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="SpecialOrderQueueFull"
+                    letter="QueueFull"
+                    destination="Final"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="ItemLookupStation"
+                servicename="iteminquiry.itemlookup.itemlookup"
+                targettier="APPLICATIONTIER"
+                launchshuttle="ItemLookupLaunchShuttle"
+                returnshuttle="ItemLookupReturnShuttle">
+                <COMMENT >
+                    Includes item lookup, checking if item is valid for
+                    transaction and adding item to transaction
+                </COMMENT>
+                <AISLE
+                    name="CheckForSizeRequired"
+                    letter="Continue"
+                    laneaction="CheckIfSizeRequiredAisle">
+                </AISLE>
+                <ROAD
+                    name="EnterSize"
+                    letter="Size"
+                    destination="EnterItemSize"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ItemAdd"
+                    letter="Continue2"
+                    destination="AddItem"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="InvalidItemNumberEntered"
+                    letter="Invalid"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ItemNotAllowedWithMultipleQuantity"
+                    letter="Ok"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ItemNotFound"
+                    letter="Retry"
+                    destination="EnterItemInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="CancelItemLookup"
+                    letter="Cancel"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Reprint Receipt service
+                        returns with a Cancel letter.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="UndoItemLookup"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the Reprint Receipt service
+                        returns with an Undo letter.
+                 </COMMENT>
+                </ROAD>
+
+                <ROAD
+                    name="ItemGiftCard"
+                    letter="GiftCard"
+                    destination="AddItem"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+
+                <ROAD
+                    name="ErrorFromUINLookup"
+                    letter="Error"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the UIN Enetered does not
+                        return any items associated with it.
+                 </COMMENT>
+                </ROAD>
+<!-- Dead road?
+                <ROAD
+                    name="CheckItemTypeCompleted"
+                    letter="Next"
+                    destination="AddItem"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+-->
+            </STATION>
+            <SITE  name="EnterItemInfo" siteaction="EnterItemInfoSite">
+                <COMMENT >
+                    This site displays the ITEM_NOT_FOUND form to allow
+                    the user to enter the required information for the
+                    item.
+                </COMMENT>
+                <AISLE
+                    name="ItemInfoEntered"
+                    letter="Next"
+                    laneaction="ItemInfoEnteredAisle">
+                 <COMMENT >
+                        This aisle is traversed after the user entered the
+                        item information. It adds the item to the item list
+                        in the cargo.
+                 </COMMENT>
+                </AISLE>
+                <AISLE
+                    name="CancelSelected"
+                    letter="Cancel"
+                    laneaction="CancelSelectedAisle">
+                 <COMMENT >
+                        Traversed when cancel is selected.
+                 </COMMENT>
+                </AISLE>
+                <ROAD
+                    name="NewItemAdded"
+                    letter="Continue"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the new item information
+                        has been stored in the cargo.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="ValidationErrorOkEnterReturnItemInformation"
+                    letter="Ok"
+                    destination="EnterItemInfo"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="UndoItem"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the user presses the Undo
+                        key in the ITEM_NOT_FOUND form.
+                 </COMMENT>
+                </ROAD>
+                <ROAD
+                    name="InvalidItem"
+                    letter="Invalid"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="CancelEnterItem"
+                    letter="Override"
+                    destination="CheckAccess"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                 <COMMENT >
+                        This road is traveled when the user presses the Cancel
+                        key from the EnterItemInfo screen.
+                 </COMMENT>
+                </ROAD>
+            </SITE>
+            <SITE  name="AddItem" siteaction="AddItemSite">
+            <!-- Begin GD-334: new aisles added by Dharmendra -->
+            	<AISLE
+                    name="CouponAlreadyExits"
+                    letter="CouponAlreadyExits"
+                    laneaction="GDYNCouponAlreadyExistsAisle">
+                </AISLE>
+            	 <AISLE
+                    name="MultipleCouponsNotAllowed"
+                    letter="MultipleCouponsNotAllowed"
+                    laneaction="GDYNMultipleCouponsNotAllowedAisle">
+                </AISLE>
+                <AISLE
+                    name="NoEligibleItemForCoupon"
+                    letter="NoEligibleItemForCoupon"
+                    laneaction="GDYNNoEligibleItemForCpnAisle">
+                </AISLE>
+                <!-- Ends GD-334: new aisles added by Dharmendra -->
+                <AISLE
+                    name="MultipleQuantitySerialItemsNotAllowed"
+                    letter="TooMany"
+                    laneaction="MultipleQuantitySerialItemsNotAllowedAisle">
+                </AISLE>
+                <AISLE
+                    name="SpecialOrder"
+                    letter="NotValid"
+                    laneaction="DisplayItemErrorAisle">
+                 <COMMENT >
+                        Special order state active and item is not valid
+                 </COMMENT>
+                </AISLE>
+		        <!-- Begin GD-384: Only applies employee discount to items posted to sell item screen -->
+		        <!-- at time employee discount applied - not to items added afterwards -->
+		        <!-- lcatania (Starmount) Apr 26, 2013 -->
+                <ROAD
+                    name="ItemAdded"
+                    letter="Continue"
+                    laneaction="GDYNItemAddedRoad"
+                    destination="RelatedItemStation"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <!-- End GD-384: Only applies employee discount to items posted to sell item screen -->
+                <ROAD
+                    name="GetSerialNumbers"
+                    letter="GetSerialNumbers"
+                    destination="SerializedItemStation"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="SpecialOrderNotEligible"
+                    letter="Invalid"
+                    laneaction="RemoveItemRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="MultipleQuantityDialogConfirmed"
+                    letter="Ok"
+                    laneaction="RemoveItemRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+            </SITE>
+            
+            
+             <!--  ajay changes start , adding  new site for  loyalty coupon flow-->
+             
+              <SITE  name="CheckForLoyaltyCoupon" siteaction="GDYNCheckForLoyaltyCouponSite">
+                <COMMENT >
+                    This site displays the ITEM_NOT_FOUND form to allow
+                    the user to enter the required information for the
+                    item.
+                </COMMENT>
+               <!--   <AISLE
+                    name="ItemInfoEntered"
+                    letter="Next"
+                    laneaction="ItemInfoEnteredAisle">
+                 <COMMENT >
+                        This aisle is traversed after the user entered the
+                        item information. It adds the item to the item list
+                        in the cargo.
+                 </COMMENT>
+                </AISLE> -->
+               
+                <ROAD
+                    name="LoyaltyCouponExist"
+                    letter="Continue"
+                    destination="CheckForLoyaltyID"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the new item information
+                        has been stored in the cargo.
+                 </COMMENT>
+              </ROAD>
+               
+                <ROAD
+                    name="InvalidItem"
+                    letter="Invalid"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <!-- By Monica to fix POS-280 -->
+                  <ROAD
+                    name="InvalidCouponItem"
+                    letter="Remove"
+                    laneaction="RemoveItemRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                
+                <ROAD
+                    name="InvalidItem"
+                    letter="Add"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                
+            </SITE>
+            
+             <SITE  name="CheckForLoyaltyID" siteaction="GDYNCheckForLoyaltyIDSite">
+                <COMMENT >
+                    This site displays the ITEM_NOT_FOUND form to allow
+                    the user to enter the required information for the
+                    item.
+                </COMMENT>
+               <!--   <AISLE
+                    name="ItemInfoEntered"
+                    letter="Next"
+                    laneaction="ItemInfoEnteredAisle">
+                 <COMMENT >
+                        This aisle is traversed after the user entered the
+                        item information. It adds the item to the item list
+                        in the cargo.
+                 </COMMENT>
+                </AISLE> -->
+               
+                <ROAD
+                    name="LoyaltyIDAlreadyAdded"
+                    letter="Continue"
+                    destination="CallLoyaltyWebservice"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the new item information
+                        has been stored in the cargo.
+                 </COMMENT>
+              </ROAD>
+               
+                <ROAD
+                    name="LoyaltlyIDNotAdded"
+                    letter="No"
+                    destination="EnterLoyaltyIdBeforeSale"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                
+            </SITE>
+            
+                       
+             
+              <SITE  name="CallLoyaltyWebservice" siteaction="GDYNCallLoyaltyWebserviceSite">
+                <COMMENT>
+                    This site displays the ITEM_NOT_FOUND form to allow
+                    the user to enter the required information for the
+                    item.
+                </COMMENT>
+               <!--   <AISLE
+                    name="ItemInfoEntered"
+                    letter="Next"
+                    laneaction="ItemInfoEnteredAisle">
+                 <COMMENT >
+                        This aisle is traversed after the user entered the
+                        item information. It adds the item to the item list
+                        in the cargo.
+                 </COMMENT>
+                </AISLE> -->
+               
+                <ROAD
+                    name="ValidResponse"
+                    letter="Valid"
+                    destination="AddCouponToTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the new item information
+                        has been stored in the cargo.
+                 </COMMENT>
+              
+               </ROAD>
+               
+                <ROAD
+                    name="InvalidResponse"
+                    letter="Invalid"   
+                    laneaction="RemoveItemRoad"                
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                
+                <ROAD
+                    name="WebserviceDown"
+                    letter="No"
+                    destination="AddCouponToTransaction"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                
+            </SITE>
+            
+            <SITE  name="AddCouponToTransaction" siteaction="GDYNAddCouponToTransactionSite">
+                <COMMENT>
+                    This site displays the ITEM_NOT_FOUND form to allow
+                    the user to enter the required information for the
+                    item.
+                </COMMENT>
+               <!--   <AISLE
+                    name="ItemInfoEntered"
+                    letter="Next"
+                    laneaction="ItemInfoEnteredAisle">
+                 <COMMENT >
+                        This aisle is traversed after the user entered the
+                        item information. It adds the item to the item list
+                        in the cargo.
+                 </COMMENT>
+                </AISLE> -->
+               
+                <ROAD
+                    name="CouponAdded"
+                    letter="Continue"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the new item information
+                        has been stored in the cargo.
+                 </COMMENT>
+                 </ROAD>
+              
+            </SITE>
+            
+            <SITE  name="CheckIfLoyaltyIDCapturedForCoupon" siteaction="GDYNCheckIfLoyaltyIDCapturedForCouponSite">
+                <COMMENT>
+                    This site displays the ITEM_NOT_FOUND form to allow
+                    the user to enter the required information for the
+                    item.
+                </COMMENT>
+               <!--   <AISLE
+                    name="ItemInfoEntered"
+                    letter="Next"
+                    laneaction="ItemInfoEnteredAisle">
+                 <COMMENT >
+                        This aisle is traversed after the user entered the
+                        item information. It adds the item to the item list
+                        in the cargo.
+                 </COMMENT>
+                </AISLE> -->
+               
+                <ROAD
+                    name="LoyaltyIDCaptured"
+                    letter="Continue"
+                    destination="CallLoyaltyWebservice"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                 <COMMENT >
+                        This road is traveled when the new item information
+                        has been stored in the cargo.
+                 </COMMENT>
+                 </ROAD>
+                 
+                 <ROAD
+                    name="LoyaltyIDNotCaptured"
+                    letter="No"
+                    laneaction="RemoveItemRoad"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+           
+              
+            </SITE>
+            
+            
+             
+              <!--  ajay changes end , added new flow to RelatedItemsAdded road-->
+              
+              
+              
+            <STATION
+                name="DisplaySendMethodStation"
+                servicename="send.displaysendmethod.displaysendmethod"
+                targettier="CURRENTTIER"
+                launchshuttle="DisplaySendMethodLaunchShuttle">
+                <COMMENT>
+                    This station goes to the display send method station for updating
+                    shipping method.
+                </COMMENT>
+                <ROAD
+                    name="DoneSelectedRoad"
+                    letter="Done"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                 <COMMENT>
+                        This road is traversed when a Done letter is received
+                 </COMMENT>
+                </ROAD>
+            </STATION>
+            <STATION
+                name="RelatedItemStation"
+                servicename="sale.relateditem.relateditem"
+                targettier="CURRENTTIER"
+                launchshuttle="RelatedItemLaunchShuttle">
+                <COMMENT>
+                    This station goes to the related item services to add all
+                    related items.
+                </COMMENT>
+                
+                <!--  ajay changes start , added new flow to RelatedItemsAdded road-->
+                
+                <!-- <ROAD
+                    name="RelatedItemsAdded"
+                    letter="Done"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>	-->
+                
+                             
+                <ROAD
+                    name="RelatedItemsAdded"
+                    letter="Done"
+                    destination="CheckForLoyaltyCoupon"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="RelatedItemsCancel"
+                    letter="Override"
+                    destination="CheckAccess"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="RelatedItemsUndo"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="ON">
+                </ROAD>
+            </STATION>
+            <STATION name="ReverseTenderStation"
+                servicename="tender.reversal.reversal"
+                targettier="CURRENTTIER"
+                launchshuttle="ReverseTenderAuthLaunchShuttle">
+                <ROAD
+                    name="TendersAuthorizeReversedRoad"
+                    letter="Success"
+                    destination="SaveCancelTransaction"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+                <ROAD
+                    name="ReverseTenderCompleted"
+                    letter="ActivationCancelled"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="ON"
+                    index="ON">
+                </ROAD>
+            </STATION>
+            <STATION
+                name="ScanSheetStation"
+                servicename="sale.scansheet.scansheet"
+                targettier="CURRENTTIER"
+                launchshuttle="ScanSheetLaunchShuttle"
+                returnshuttle="ScanSheetReturnShuttle">                
+                <ROAD
+                    name="Next"
+                    letter="Next"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+                <ROAD
+                    name="Undo"
+                    letter="Undo"
+                    destination="ShowSaleScreen"
+                    tape="ADVANCE"
+                    record="OFF"
+                    index="OFF">
+                </ROAD>
+            </STATION>
+            <SYSTEMSITE  name="Final" action="RETURN"/>
+            <SYSTEMSITE  name="LastIndexed" action="BACKUP"/>
+            <SYSTEMSITE  name="NamedIndex" action="BACKUP"/>
+        </REGION>
+    </MAP>
+</SERVICE>
