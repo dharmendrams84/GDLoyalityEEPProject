@@ -57,8 +57,8 @@ public class GDYNEnterLoyaltyIdBeforeSaleSite extends PosSiteActionAdapter {
 		
 		/*  code changes added by Ashwinee to fix  issue POS-317 on  11/01/2017 */
 		   
-		  /* GDYNSaleCargoIfc saleCargo = (GDYNSaleCargoIfc) bus.getCargo();  
-		   saleCargo.setLoyaltyPhoneNo("");*/
+		   GDYNSaleCargoIfc saleCargo = (GDYNSaleCargoIfc) bus.getCargo();  
+		   saleCargo.setLoyaltyPhoneNo("");
 		
 		/* End code changes added by Ashwinee to fix issue POS-317 on  11/01/2017 */
 		
