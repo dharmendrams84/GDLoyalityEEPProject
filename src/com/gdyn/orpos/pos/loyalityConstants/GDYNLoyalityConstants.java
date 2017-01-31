@@ -8,7 +8,6 @@ public class GDYNLoyalityConstants {
 	 
 	 /*new boolean value added by Dharmendra to recalculate discount when multiple coupons applied to a transaction*/ 
 	 public static Boolean recalculateMultipleCpnDiscount = Boolean.FALSE;
-	 public static Boolean recalculateTransactionDiscount = Boolean.FALSE;
 		
 	 public static  BigDecimal minThreshHoldAmt = BigDecimal.ZERO;
 	 
