@@ -232,7 +232,7 @@ public class AddItemSite extends PosSiteActionAdapter
         //start POS-334 code changes added by Dharmendra to fix 
         List<PLUItemIfc> couponItemsList = GDYNLoyalityDiscountUtility.getAllCouponItemsList(transaction);
         Boolean areAllItemLevelCpns = GDYNLoyalityDiscountUtility.areAllItemLevelCoupons(couponItemsList);
-        Boolean areAllTransactionLevelCpns = GDYNLoyalityDiscountUtility.areAllTransactionLevelCoupons(couponItemsList);
+        Boolean areAllTransactionLevelCpns = GDYNLoyalityDiscountUtility.areAllItemLevelCoupons(couponItemsList);
         logger.info("areAllItemLevelCpns "+areAllItemLevelCpns+" areAllTransactionLevelCpns "+areAllTransactionLevelCpns);
         Boolean eligibleItemsExist = true;
        
@@ -243,12 +243,7 @@ public class AddItemSite extends PosSiteActionAdapter
 		} else if ((couponItemsList.size() > 1 && !areAllItemLevelCpns)) {
 			letter = "MultipleCouponsNotAllowed";
 			couponItemsList.remove(couponItemsList.size()-1);
-			if(areAllTransactionLevelCpns){
-				GDYNLoyalityConstants.recalculateTransactionDiscount =true;
-				GDYNLoyalityDiscountUtility.applyLoyalityTransactionDiscount(bus, couponItemsList);
-			}else{
 			GDYNLoyalityConstants.recalculateMultipleCpnDiscount = true;
-			}
 			 
 		} else if (couponItemsList.size() > 1 && areAllItemLevelCpns) {
 			eligibleItemsExist = GDYNLoyalityDiscountUtility
