@@ -105,7 +105,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import oracle.retail.stores.common.utility.Util;
-import oracle.retail.stores.domain.discount.AdvancedPricingRuleIfc;
 import oracle.retail.stores.domain.lineitem.SaleReturnLineItem;
 import oracle.retail.stores.domain.lineitem.SaleReturnLineItemIfc;
 import oracle.retail.stores.domain.stock.PLUItemIfc;
@@ -283,104 +282,78 @@ public class TenderingInfoUISite extends PosSiteActionAdapter
 				.iterator();
 		
 		String couponItemDesc = "";
-		String cpnItemApplyTo = "";
-		Boolean itemLevelCpnExists = false;
 		while (lineItemsVectorIterator.hasNext()) {
 			SaleReturnLineItemIfc srli = lineItemsVectorIterator.next();
-
-			if (srli.getPLUItem().isStoreCoupon()
-					&& srli.getPLUItem().getLoyalityCpnAttrDtls() != null) {
-				loylCpnExists = Boolean.TRUE;
-				cpnItemApplyTo = srli.getPLUItem().getLoyalityCpnAttrDtls()
-						.getItmApplyTo();
-				couponItemDesc = srli.getPLUItem().getManufacturerItemUPC();
-				AdvancedPricingRuleIfc[] advancedPricingRuleIfcs = srli
-						.getPLUItem().getAdvancedPricingRules();
-				if (advancedPricingRuleIfcs != null
-						&& advancedPricingRuleIfcs.length != 0) {
-					int discountScope = advancedPricingRuleIfcs[0]
-							.getDiscountScope();
-					if(discountScope==1){
-						itemLevelCpnExists = true;
-					}
-				}
+			
+			
+			
 				
-				if (srli.getPLUItem().getLoyalityCpnHrchyDtlsList() != null
-						&& srli.getPLUItem().getLoyalityCpnHrchyDtlsList()
-								.size() != 0) {
+			
+			if(srli.getPLUItem().isStoreCoupon()&&srli.getPLUItem().getLoyalityCpnAttrDtls()!=null){
+		    	loylCpnExists =Boolean.TRUE;
+				couponItemDesc = srli.getPLUItem().getManufacturerItemUPC();
+				if(srli.getPLUItem().getLoyalityCpnHrchyDtlsList() != null
+						&& srli.getPLUItem().getLoyalityCpnHrchyDtlsList().size() != 0){
 					loylCpnMrchyDtlsExists = Boolean.TRUE;
-
-					
+					break;
 				}
-				break;
 			}
 		}
     	
+		logger.info("coupon item has merchandise details "+loylCpnMrchyDtlsExists + "  minimum thresh hold amount "+minThreshHoldAmt);
 		
+    	lineItemsVectorIterator = lineItemsvector
+				.iterator();
+    	
+		while (lineItemsVectorIterator.hasNext()) {
+			SaleReturnLineItemIfc srli = lineItemsVectorIterator.next();
+			if (srli.getPLUItem().getIsLoylDiscountElligible()) {
+				isloyailityElligibleItemExist = Boolean.TRUE;
+				break;
+			}
+		}
+		
+		logger.info("Transaction contains elligible items "+isloyailityElligibleItemExist);
+		logger.info("transaction subtotal "+transaction.getTransactionTotals().getSubtotal()
+						.getDecimalValue());
 		lineItemsvector = transaction.getItemContainerProxy().getLineItemsVector();
-		/*String cpnItemApplyTo = "";
+		String cpnItemApplyTo = "";
 		for(SaleReturnLineItem srli : lineItemsvector){
 			if(srli.getPLUItem().isStoreCoupon()){
 				cpnItemApplyTo = srli.getPLUItem().getLoyalityCpnAttrDtls().getItmApplyTo();
 				logger.info("cpnItemApplyTo "+cpnItemApplyTo);
 			}
 		}
-		*/
-		if (!itemLevelCpnExists) {
+		
+		
+		for(SaleReturnLineItem srli : lineItemsvector){
+			if(!srli.getPLUItem().isStoreCoupon()){
+				srli.getPLUItem().setIsLoylDiscountElligible(true);
+				PLUItemIfc pluItemIfc = srli.getPLUItem();
+				Boolean isLoyaityDiscountElligible =false;
+				if (cpnItemApplyTo == null
+						|| GDYNLoyalityConstants.blankString
+								.equalsIgnoreCase(cpnItemApplyTo)
+						|| GDYNLoyalityConstants.itemApplyToB
+								.equalsIgnoreCase(cpnItemApplyTo)) {
+					isLoyaityDiscountElligible = Boolean.TRUE;
+				} else if (GDYNLoyalityConstants.itemApplyToC
+						.equalsIgnoreCase(cpnItemApplyTo)
+						&& (!pluItemIfc.getItemClassification()
+								.getEmployeeDiscountAllowedFlag())) {
+					isLoyaityDiscountElligible = Boolean.TRUE;
 
-			for (SaleReturnLineItem srli : lineItemsvector) {
-				if (!srli.getPLUItem().isStoreCoupon()) {
-					srli.getPLUItem().setIsLoylDiscountElligible(true);
-					PLUItemIfc pluItemIfc = srli.getPLUItem();
-					Boolean isLoyaityDiscountElligible = false;
-					if (cpnItemApplyTo == null
-							|| GDYNLoyalityConstants.blankString
-									.equalsIgnoreCase(cpnItemApplyTo)
-							|| GDYNLoyalityConstants.itemApplyToB
-									.equalsIgnoreCase(cpnItemApplyTo)) {
-						isLoyaityDiscountElligible = Boolean.TRUE;
-					} else if (GDYNLoyalityConstants.itemApplyToC
-							.equalsIgnoreCase(cpnItemApplyTo)
-							&& (!pluItemIfc.getItemClassification()
-									.getEmployeeDiscountAllowedFlag())) {
-						isLoyaityDiscountElligible = Boolean.TRUE;
-
-					} else if (GDYNLoyalityConstants.itemApplyToR
-							.equalsIgnoreCase(cpnItemApplyTo)
-							&& (pluItemIfc.getItemClassification()
-									.getEmployeeDiscountAllowedFlag())) {
-						isLoyaityDiscountElligible = Boolean.TRUE;
-					}
-					srli.getPLUItem().setIsLoylDiscountElligible(
-							isLoyaityDiscountElligible);
+				} else if (GDYNLoyalityConstants.itemApplyToR
+						.equalsIgnoreCase(cpnItemApplyTo)
+						&& (pluItemIfc.getItemClassification()
+								.getEmployeeDiscountAllowedFlag())) {
+					isLoyaityDiscountElligible = Boolean.TRUE;
+				}
+				srli.getPLUItem().setIsLoylDiscountElligible(isLoyaityDiscountElligible);
 
 				}
-			}
 		}
 		
-		if (!itemLevelCpnExists) {
-			lineItemsVectorIterator = lineItemsvector.iterator();
-
-			while (lineItemsVectorIterator.hasNext()) {
-				SaleReturnLineItemIfc srli = lineItemsVectorIterator.next();
-				if (srli.getPLUItem().getIsLoylDiscountElligible()) {
-					isloyailityElligibleItemExist = Boolean.TRUE;
-					break;
-				}
-			}
-		}
-		Boolean itemCouponDiscountApplied = false;
-		if (itemLevelCpnExists) {
-			lineItemsVectorIterator = lineItemsvector.iterator();
-
-			while (lineItemsVectorIterator.hasNext()) {
-				SaleReturnLineItemIfc srli = lineItemsVectorIterator.next();
-				if (srli.getPLUItem().getLoyalityDiscountAppliedFlag()) {
-					itemCouponDiscountApplied = true;
-					break;
-				}
-			}
-		}
 	if(loylCpnExists
 					&& transaction.getTransactionTotals().getSubtotal()
 							.getDecimalValue().compareTo(minThreshHoldAmt) < 0){
@@ -408,8 +381,7 @@ public class TenderingInfoUISite extends PosSiteActionAdapter
 						.getManager(UIManagerIfc.TYPE);
 				ui.showScreen(POSUIManagerIfc.DIALOG_TEMPLATE, dialogModel);
 			} else if ((loylCpnMrchyDtlsExists&&loylCpnExists && !isloyailityElligibleItemExist)
-					||(loylCpnExists&& transaction.getTransactionTotals().getDiscountTotal().getDecimalValue().compareTo(BigDecimal.ZERO)==0)
-					||(itemLevelCpnExists&&!itemCouponDiscountApplied)) {
+					||(loylCpnExists&& transaction.getTransactionTotals().getDiscountTotal().getDecimalValue().compareTo(BigDecimal.ZERO)==0)) {
 				DialogBeanModel dialogModel = new DialogBeanModel();
 				dialogModel.setResourceID("LoyaltyNoElligibleItems");
 				dialogModel.setType(DialogScreensIfc.ERROR);
