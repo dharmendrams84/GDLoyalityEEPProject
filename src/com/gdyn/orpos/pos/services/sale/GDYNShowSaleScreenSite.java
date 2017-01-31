@@ -687,17 +687,6 @@ public class GDYNShowSaleScreenSite extends ShowSaleScreenSite {
 						bus, couponItemsList);
 				GDYNLoyalityConstants.recalculateMultipleCpnDiscount = false;
 
-			}else if (couponItemsList != null 
-					&& GDYNLoyalityConstants.recalculateTransactionDiscount){
-				GDYNLoyalityDiscountUtility.applyLoyalityTransactionDiscount(bus, couponItemsList);
-				GDYNLoyalityConstants.recalculateTransactionDiscount=false;
-				
-				transaction.getTransactionTotals().getAmountOffTotal().setDecimalValue(
-						transaction.getTransactionTotals().getDiscountTotal().getDecimalValue());
-				transaction.updateTransactionTotals();
-				transaction.updateTenderTotals();
-				
-				
 			}
 		}
 		//POS-334 End code changes by Dharmendra to apply multiple item discounts to a transaction
